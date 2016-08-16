@@ -24,47 +24,59 @@ class ContributionPage extends Component {
     }
 
     sendPokemon() {
-        date = new Date();
-        console.log(date);
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                action: "test",
-                date: "une date",
-                location: "X Y Z",
-                pokemon: "ratata"
+        console.log(this.state.pokemonName);
+        /*if (this.pokemonName.trim() === "") {
+            alert("The Pokemon name can't be empty !!");
+        } else {
+            date = new Date();
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    action: "test",
+                    date: "une date",
+                    location: "X Y Z",
+                    pokemon: "ratata"
+                })
             })
-        })
-        //.then((response) => response.json())
-            .then((responseData) => {
-                console.log(responseData);
-            })
-            .catch((error) => {
-                console.warn(error);
-            })
-            .done();
-
+            //.then((response) => response.json())
+                .then((responseData) => {
+                    console.log(responseData);
+                })
+                .catch((error) => {
+                    console.warn(error);
+                })
+                .done();
+        }*/
     }
 
     render() {
         return (
             <View style={styles.container}>
-                <Text style={styles.welcome}>
-                    Welcome to PokeAlert !!
+                <Text style={styles.title}>
+                    Welcome to the Contribution Page !!
                 </Text>
-                <Text style={styles.instructions}>
+                <Button
+                    onPress={this.goToHomePage.bind(this)}
+                    containerStyle={styles.buttonContainer}
+                    style={styles.button}>
+                    Back to the Home Page
+                </Button>
+                <Text style={styles.text}>
                     Send the form if you see a pokemon !
                 </Text>
+                <Text>
+                    {this.state.pokemonName}
+                </Text>
                 <TextInput
-                    onChangeText={(pokemon_name) => this.setState({pokemon_name})}
+                    onChangeText={(pokemonName) => this.setState({pokemonName})}
                 />
                 <Button
-                    style={{fontSize: 20, color: 'green'}}
-                    styleDisabled={{color: 'red'}}
+                    style={styles.button}
+                    containerStyle={styles.buttonContainer}
                     onPress={this.sendPokemon}>
                     Send
                 </Button>
@@ -78,19 +90,32 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#F5FCFF',
     },
-    pokemonInput: {
-        color: '#000000',
-    },
-    welcome: {
+    title: {
         fontSize: 20,
         textAlign: 'center',
         margin: 10,
     },
-    instructions: {
+    text: {
         textAlign: 'center',
-        color: '#333333',
-        marginBottom: 5,
+        fontSize: 15,
+        marginTop: 10,
+        marginBottom: 10,
     },
+    pokemonInput: {
+        color: '#000000',
+    },
+    buttonContainer : {
+        marginTop: 10,
+        padding:10,
+        height:45,
+        overflow:'hidden',
+        borderRadius:4,
+        backgroundColor: 'black',
+        marginBottom: 10,
+    },
+    button: {
+        color: "#FFFFFF",
+    }
 });
 
 AppRegistry.registerComponent('Pokealert', () => ContributionPage);
