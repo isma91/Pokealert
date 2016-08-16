@@ -39,8 +39,3 @@ buck-out/
 \.buckd/
 android/app/libs
 android/keystores/debug.keystore
-Supprimerait android/
-Supprimerait index.android.js
-Supprimerait index.ios.js
-Supprimerait ios/
-Supprimerait package.json
