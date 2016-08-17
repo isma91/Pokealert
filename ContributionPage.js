@@ -23,9 +23,13 @@ class ContributionPage extends Component {
         this.props.navigator.pop();
     }
 
+    updatePokemon(pokemon) {
+        this.pokemon_name = pokemon;
+    }
+
     sendPokemon() {
-        console.log(this.state.pokemonName);
-        /*if (this.pokemonName.trim() === "") {
+        pokemon = this.state.pokemonName.trim();
+        if (pokemon === "") {
             alert("The Pokemon name can't be empty !!");
         } else {
             date = new Date();
@@ -36,21 +40,19 @@ class ContributionPage extends Component {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    action: "test",
+                    action: "sendPokemon",
                     date: "une date",
                     location: "X Y Z",
-                    pokemon: "ratata"
+                    pokemon: pokemon
                 })
-            })
-            //.then((response) => response.json())
-                .then((responseData) => {
+            }).then(
+                (response) => response.json()
+            ).then((responseData) => {
                     console.log(responseData);
-                })
-                .catch((error) => {
+                }).catch((error) => {
                     console.warn(error);
-                })
-                .done();
-        }*/
+                }).done();
+        }
     }
 
     render() {
@@ -68,16 +70,13 @@ class ContributionPage extends Component {
                 <Text style={styles.text}>
                     Send the form if you see a pokemon !
                 </Text>
-                <Text>
-                    {this.state.pokemonName}
-                </Text>
                 <TextInput
                     onChangeText={(pokemonName) => this.setState({pokemonName})}
                 />
                 <Button
                     style={styles.button}
                     containerStyle={styles.buttonContainer}
-                    onPress={this.sendPokemon}>
+                    onPress={this.sendPokemon.bind(this)}>
                     Send
                 </Button>
             </View>
