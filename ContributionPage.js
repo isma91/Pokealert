@@ -26,10 +26,6 @@ class ContributionPage extends Component {
         this.props.navigator.pop();
     }
 
-    updatePokemon(pokemon) {
-        this.pokemon_name = pokemon;
-    }
-
     findPokemonByName(pokemonName) {
         if (pokemonName.trim() !== "") {
             fetch(url, {
@@ -148,9 +144,6 @@ const styles = StyleSheet.create({
         fontSize: 15,
         marginTop: 10,
         marginBottom: 10,
-    },
-    pokemonInput: {
-        color: '#000000',
     },
     buttonContainer : {
         marginTop: 10,
