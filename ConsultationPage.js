@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
+import Mapbox, { MapView } from 'react-native-mapbox-gl';
 import {
     AppRegistry,
     StyleSheet,
     Text,
     View,
-    Dimensions,
     Navigator,
 } from 'react-native';
+const accessToken = 'pk.eyJ1IjoiaXNtYTkxIiwiYSI6ImNpczA2bnl3NzAwMDEyem83NTQ0cHN0dTMifQ.grfJLqkKt9cjpAQusLI9_w';
+Mapbox.setAccessToken(accessToken);
 var Button = require('react-native-button');
 var url = "http://192.168.56.1/pokealert_api/public_api/index.php";
 
@@ -15,26 +17,30 @@ class ConsultationPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            pokemonName : "",
-            windows : Dimensions.get("window"),
-            height: window.height / 2,
-            width : window.width,
-            initialLatitude : "",
-            initalLongitude : "",
-            lastLatitude : "",
-            lastLongitude : "",
-        };
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                console.log(JSON.stringify(position));
+            center : {
+                //latitude : 48.9015,
+                latitude : 0,
+                //longitude : 2.32551
+                longitude : 0
             },
-            (error) => alert("Looks like an error in your GPS : " + error.message),
-            {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000}
-        );
+            actualLatitude : 0,
+            actualLongitude : 0,
+        };
     }
 
     goToHomePage () {
         this.props.navigator.pop();
+    }
+
+    goToActualPosition () {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                position = JSON.stringify(position);
+                position = JSON.parse(position);
+                this._map.setCenterCoordinate(position.coords.latitude, position.coords.longitude, true);
+            },
+            (error) => alert("Looks like an error in your GPS : " + error.message),
+        );
     }
 
     render() {
@@ -49,6 +55,24 @@ class ConsultationPage extends Component {
                     style={styles.button}>
                     Back to the Home Page
                 </Button>
+                <Button
+                    onPress={this.goToActualPosition.bind(this)}
+                    containerStyle={styles.buttonContainer}
+                    style={styles.button}>
+                    Go to your position
+                </Button>
+                <MapView
+                    ref={map => { this._map = map; }}
+                    style={styles.map}
+                    styleURL={Mapbox.mapStyles.streets}
+                    showsUserLocation={false}
+                    zoomEnabled={true}
+                    initialZoomLevel={16}
+                    initialCenterCoordinate={this.state.center}
+                    logoIsHidden={true}
+                    compassIsHidden={false}
+                    onFinishLoadingMap={this.goToActualPosition.bind(this)}
+                />
             </View>
         );
     }
@@ -58,6 +82,9 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#F5FCFF',
+    },
+    map: {
+        flex : 1,
     },
     title: {
         fontSize: 20,
