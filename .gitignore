@@ -40,3 +40,7 @@ buck-out/
 android/app/libs
 android/keystores/debug.keystore
 api/config.php
+
+#ONLY FOR ANDROID HELL YEAH
+ios/
+index.ios.js
