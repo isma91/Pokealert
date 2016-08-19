@@ -44,3 +44,4 @@ api/config.php
 #ONLY FOR ANDROID HELL YEAH
 ios/
 index.ios.js
+pokealert_api/config.php
