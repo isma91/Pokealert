@@ -6,6 +6,7 @@ import {
     Text,
     View,
     Navigator,
+    Picker,
 } from 'react-native';
 const accessToken = 'pk.eyJ1IjoiaXNtYTkxIiwiYSI6ImNpczA2bnl3NzAwMDEyem83NTQ0cHN0dTMifQ.grfJLqkKt9cjpAQusLI9_w';
 Mapbox.setAccessToken(accessToken);
@@ -18,13 +19,12 @@ class ConsultationPage extends Component {
         super(props);
         this.state = {
             center : {
-                //latitude : 48.9015,
                 latitude : 0,
-                //longitude : 2.32551
                 longitude : 0
             },
             actualLatitude : 0,
             actualLongitude : 0,
+            interval : 10,
         };
     }
 
@@ -32,11 +32,37 @@ class ConsultationPage extends Component {
         this.props.navigator.pop();
     }
 
-    goToActualPosition () {
+    goToActualPosition (key, value) {
+        if (value == undefined) {
+            value = 10;
+        }
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 position = JSON.stringify(position);
                 position = JSON.parse(position);
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: "findAllPokemonByLocation",
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                        interval: value,
+                    })
+                }).then((responseData) => {
+                    responseData = JSON.parse(responseData._bodyInit);
+                    console.log(responseData);
+                    if (responseData.error !== null) {
+                        alert(responseData.error);
+                    } else {
+                        this.state.jsonDataPokemon = responseData.data;
+                    }
+                }).catch((error) => {
+                    alert("Error while trying to get all pokemon in your area !!\n" + error);
+                }).done();
                 this._map.setCenterCoordinate(position.coords.latitude, position.coords.longitude, true);
             },
             (error) => alert("Looks like an error in your GPS : " + error.message),
@@ -61,6 +87,14 @@ class ConsultationPage extends Component {
                     style={styles.button}>
                     Go to your position
                 </Button>
+                <Picker
+                    selectedValue={this.state.interval}
+                    onValueChange={this.goToActualPosition.bind(this, "interval")}
+                >
+                    <Picker.Item label="less than 10 min" value={10} />
+                    <Picker.Item label="less than 20 min" value={20} />
+                    <Picker.Item label="less than 30 min" value={30} />
+                </Picker>
                 <MapView
                     ref={map => { this._map = map; }}
                     style={styles.map}
@@ -71,7 +105,7 @@ class ConsultationPage extends Component {
                     initialCenterCoordinate={this.state.center}
                     logoIsHidden={true}
                     compassIsHidden={false}
-                    onFinishLoadingMap={this.goToActualPosition.bind(this)}
+                    onFinishLoadingMap={this.goToActualPosition.bind(this, this.state.interval)}
                 />
             </View>
         );
