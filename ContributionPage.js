@@ -58,6 +58,8 @@ class ContributionPage extends Component {
             date = new Date();
             navigator.geolocation.getCurrentPosition(
                 (position) => {
+                    position = JSON.stringify(position);
+                    position = JSON.parse(position);
                     fetch(url, {
                         method: 'POST',
                         headers: {
@@ -68,7 +70,8 @@ class ContributionPage extends Component {
                             action: "sendPokemon",
                             user: "anonymous",
                             date: new Date().toISOString().slice(0, 19).replace('T', ' '),
-                            location: JSON.stringify(position),
+                            latitude: parseFloat(position.coords.latitude.toString().substr(0, 7)),
+                            longitude: parseFloat(position.coords.longitude.toString().substr(0, 6)),
                             idPokemon: pokemon
                         })
                     }).then((responseData) => {
