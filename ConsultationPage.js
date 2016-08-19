@@ -22,9 +22,8 @@ class ConsultationPage extends Component {
                 latitude : 0,
                 longitude : 0
             },
-            actualLatitude : 0,
-            actualLongitude : 0,
             interval : 10,
+            annotations: [],
         };
     }
 
@@ -54,7 +53,20 @@ class ConsultationPage extends Component {
                     })
                 }).then((responseData) => {
                     responseData = JSON.parse(responseData._bodyInit);
-                    console.log(responseData);
+                    this.setState({annotations: []});
+                    console.log(responseData.data);
+                    for (var i = 0; i < responseData.data.length; i++) {
+                        this.setState({
+                            annotations: [...this.state.annotations, {
+                                coordinates: [parseFloat(responseData.data[i].latitude), parseFloat(responseData.data[i].longitude)],
+                                type: "point",
+                                title: responseData.data[i].name,
+                                subtitle: "foud at " + responseData.data[i].date,
+                                id: responseData.data[i].name + "-" + responseData.data[i].date + "-" + i
+                            }]
+                        })
+                    }
+                    console.log(this.state.annotations);
                     if (responseData.error !== null) {
                         alert(responseData.error);
                     } else {
@@ -64,6 +76,20 @@ class ConsultationPage extends Component {
                     alert("Error while trying to get all pokemon in your area !!\n" + error);
                 }).done();
                 this._map.setCenterCoordinate(position.coords.latitude, position.coords.longitude, true);
+                setTimeout(() => {this._map.easeTo({ pitch : 80})}, 1000);
+                //@TODO: put the limit of the ara in the map
+                /*areaAnnotation = [{
+                 coordinates : [[position.coords.latitude - 0.0002, position.coords.longitude + 0.0002],
+                 [position.coords.latitude, position.coords.longitude + 0.0002],
+                 [position.coords.latitude + 0.0002, position.coords.longitude + 0.0002],
+                 [position.coords.latitude + 0.0002, position.coords.longitude],
+                 [position.coords.latitude + 0.0002, position.coords.longitude - 0.0002],
+                 [position.coords.latitude, position.coords.longitude - 0.0002],
+                 [position.coords.latitude - 0.0002, position.coords.longitude - 0.0002],
+                 [position.coords.latitude - 0.0002, position.coords.longitude]],
+                 types : "polygon",
+                 id: "area"
+                 }]*/
             },
             (error) => alert("Looks like an error in your GPS : " + error.message),
         );
@@ -98,6 +124,8 @@ class ConsultationPage extends Component {
                 <MapView
                     ref={map => { this._map = map; }}
                     style={styles.map}
+                    annotations={this.state.annotations}
+                    annotationsAreImmutable={true}
                     styleURL={Mapbox.mapStyles.streets}
                     showsUserLocation={false}
                     zoomEnabled={true}
