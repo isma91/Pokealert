@@ -31,13 +31,6 @@ Class PokemonsController extends Pokemon
         $bdd = new Bdd();
         $arrayFieldAndValue = array("username" => $user, "latitude" => $latitude, "longitude" => $longitude, "date" => $date, "pokemonId" => $pokemonId);
         $sql = $bdd->insert('contribution', $arrayFieldAndValue);
-        /*$sql = "INSERT INTO `contribution`(`username`, `latitude`, `longitude`, `date`, `pokemonId`) VALUES (:username, :latitude, :longitude, :date, :pokemonId)";
-        $pushContribution = $bdd->getBdd()->prepare($sql);
-        $pushContribution->bindParam(':username', $user);
-        $pushContribution->bindParam(':latitude', $latitude);
-        $pushContribution->bindParam(':longitude', $longitude);
-        $pushContribution->bindParam(':date', $date);
-        $pushContribution->bindParam(':pokemonId', $pokemonId);*/
         if ($sql) {
             self::sendJson(null, null);
         } else {
@@ -52,10 +45,6 @@ Class PokemonsController extends Pokemon
         $field = array("id", "name", "img");
         $where = "name LIKE '" . "$pokemon" . "'";
         $findAllPokemon = $bdd->select('pokemon', $field, $where);
-        /*$sql = "SELECT `id`, `name`, `img` FROM `pokemon` WHERE `name` LIKE :pokemon";
-        $findPokemon = $bdd->getBdd()->prepare($sql);
-        $findPokemon->bindParam(':pokemon', $pokemon);
-        $findAllPokemon = $sql->fetchAll(\PDO::FETCH_ASSOC);*/
         self::sendJson(null, $findAllPokemon);
     }
 
@@ -80,17 +69,6 @@ Class PokemonsController extends Pokemon
         );
         $where = "(contribution.latitude >= $minLatitude AND contribution.longitude <= $maxLongitude AND contribution.date >= '" . "$intervalDate" . "') OR (contribution.latitude = $latitude AND contribution.longitude >= $maxLongitude AND contribution.date >= '" . "$intervalDate" . "') OR (contribution.latitude <= $minLatitude AND contribution.longitude >= $maxLongitude AND contribution.date >= '" . "$intervalDate" . "') OR (contribution.latitude >= $minLatitude AND contribution.longitude = $longitude AND contribution.date >= '" . "$intervalDate" . "') OR (contribution.latitude >= $minLatitude AND contribution.longitude = $longitude AND contribution.date >= '" . "$intervalDate" . "') OR (contribution.latitude <= $maxLatitude AND contribution.longitude >= $minLongitude AND contribution.date >= '" . "$intervalDate" . "') OR (contribution.latitude = $latitude AND contribution.longitude >= $minLongitude AND contribution.date >= '" . "$intervalDate" . "') OR (contribution.latitude <= $maxLatitude AND contribution.longitude >= $minLongitude AND contribution.date >= '" . "$intervalDate" . "')";
         $findAllPokemonInArea = $bdd->select("contribution", $field, $where, $innerJoin);
-        /*$sql = "SELECT contribution.username, contribution.latitude, contribution.longitude, contribution.date, pokemon.name, pokemon.img FROM `contribution` INNER JOIN pokemon ON contribution.pokemonId = pokemon.id WHERE (contribution.latitude >= :minLatitude AND contribution.longitude <= :maxLongitude AND contribution.date >= :intervalDate) OR (contribution.latitude = :latitude AND contribution.longitude >= :maxLongitude AND contribution.date >= :intervalDate) OR (contribution.latitude <= :minLatitude AND contribution.longitude >= :maxLongitude AND contribution.date >= :intervalDate) OR (contribution.latitude >= :minLatitude AND contribution.longitude = :longitude AND contribution.date >= :intervalDate) OR (contribution.latitude >= :minLatitude AND contribution.longitude = :longitude AND contribution.date >= :intervalDate) OR (contribution.latitude <= :maxLatitude AND contribution.longitude >= :minLongitude AND contribution.date >= :intervalDate) OR (contribution.latitude = :latitude AND contribution.longitude >= :minLongitude AND contribution.date >= :intervalDate) OR (contribution.latitude <= :maxLatitude AND contribution.longitude >= :minLongitude AND contribution.date >= :intervalDate)";
-        $findPokemonInArea = $bdd->getBdd()->prepare($sql);
-        $findPokemonInArea->bindParam(":latitude", $latitude);
-        $findPokemonInArea->bindParam(":maxLatitude", $maxLatitude);
-        $findPokemonInArea->bindParam(":minLatitude", $minLatitude);
-        $findPokemonInArea->bindParam(":longitude", $longitude);
-        $findPokemonInArea->bindParam(":maxLongitude", $maxLongitude);
-        $findPokemonInArea->bindParam(":minLongitude", $minLongitude);
-        $findPokemonInArea->bindParam(":intervalDate", $intervalDate);
-        $findPokemonInArea->execute();
-        $findAllPokemonInArea = $findPokemonInArea->fetchAll(\PDO::FETCH_ASSOC);*/
         self::sendJson(null, $findAllPokemonInArea);
     }
 }
