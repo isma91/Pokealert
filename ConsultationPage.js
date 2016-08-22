@@ -54,42 +54,46 @@ class ConsultationPage extends Component {
                 }).then((responseData) => {
                     responseData = JSON.parse(responseData._bodyInit);
                     this.setState({annotations: []});
-                    console.log(responseData.data);
-                    for (var i = 0; i < responseData.data.length; i++) {
-                        this.setState({
-                            annotations: [...this.state.annotations, {
-                                coordinates: [parseFloat(responseData.data[i].latitude), parseFloat(responseData.data[i].longitude)],
-                                type: "point",
-                                title: responseData.data[i].name,
-                                subtitle: "foud at " + responseData.data[i].date,
-                                id: responseData.data[i].name + "-" + responseData.data[i].date + "-" + i
-                            }]
-                        })
-                    }
-                    console.log(this.state.annotations);
+                    console.log(responseData);
                     if (responseData.error !== null) {
                         alert(responseData.error);
                     } else {
-                        this.state.jsonDataPokemon = responseData.data;
+                        for (var i = 0; i < responseData.data.length; i++) {
+                            this.setState({
+                                annotations: [...this.state.annotations, {
+                                    coordinates: [parseFloat(responseData.data[i].latitude), parseFloat(responseData.data[i].longitude)],
+                                    type: "point",
+                                    title: responseData.data[i].name,
+                                    subtitle: "found at " + responseData.data[i].date,
+                                    id: responseData.data[i].id
+                                }]
+                            })
+                        }
+                        this.setState({
+                            annotations: [...this.state.annotations, {
+                                coordinates : [[position.coords.latitude - 0.0002, position.coords.longitude + 0.0002],
+                                    [position.coords.latitude, position.coords.longitude + 0.0002],
+                                    [position.coords.latitude + 0.0002, position.coords.longitude + 0.0002],
+                                    [position.coords.latitude + 0.0002, position.coords.longitude],
+                                    [position.coords.latitude + 0.0002, position.coords.longitude - 0.0002],
+                                    [position.coords.latitude, position.coords.longitude - 0.0002],
+                                    [position.coords.latitude - 0.0002, position.coords.longitude - 0.0002],
+                                    [position.coords.latitude - 0.0002, position.coords.longitude],
+                                    [position.coords.latitude - 0.0002, position.coords.longitude + 0.0002]],
+                                type: "polyline",
+                                strokeColor: "#000000",
+                                strokeAlpha: 1,
+                                strokeWidth: 5,
+                                id: "area"
+                            }]
+                        });
                     }
                 }).catch((error) => {
                     alert("Error while trying to get all pokemon in your area !!\n" + error);
                 }).done();
                 this._map.setCenterCoordinate(position.coords.latitude, position.coords.longitude, true);
                 setTimeout(() => {this._map.easeTo({ pitch : 80})}, 1000);
-                //@TODO: put the limit of the ara in the map
-                /*areaAnnotation = [{
-                 coordinates : [[position.coords.latitude - 0.0002, position.coords.longitude + 0.0002],
-                 [position.coords.latitude, position.coords.longitude + 0.0002],
-                 [position.coords.latitude + 0.0002, position.coords.longitude + 0.0002],
-                 [position.coords.latitude + 0.0002, position.coords.longitude],
-                 [position.coords.latitude + 0.0002, position.coords.longitude - 0.0002],
-                 [position.coords.latitude, position.coords.longitude - 0.0002],
-                 [position.coords.latitude - 0.0002, position.coords.longitude - 0.0002],
-                 [position.coords.latitude - 0.0002, position.coords.longitude]],
-                 types : "polygon",
-                 id: "area"
-                 }]*/
+                //setTimeout(() => {this._map.setZoomLevel(19)}, 1000);
             },
             (error) => alert("Looks like an error in your GPS : " + error.message),
         );
@@ -107,12 +111,6 @@ class ConsultationPage extends Component {
                     style={styles.button}>
                     Back to the Home Page
                 </Button>
-                <Button
-                    onPress={this.goToActualPosition.bind(this)}
-                    containerStyle={styles.buttonContainer}
-                    style={styles.button}>
-                    Go to your position
-                </Button>
                 <Picker
                     selectedValue={this.state.interval}
                     onValueChange={this.goToActualPosition.bind(this, "interval")}
@@ -127,9 +125,9 @@ class ConsultationPage extends Component {
                     annotations={this.state.annotations}
                     annotationsAreImmutable={true}
                     styleURL={Mapbox.mapStyles.streets}
-                    showsUserLocation={false}
+                    showsUserLocation={true}
                     zoomEnabled={true}
-                    initialZoomLevel={16}
+                    initialZoomLevel={19.6}
                     initialCenterCoordinate={this.state.center}
                     logoIsHidden={true}
                     compassIsHidden={false}
