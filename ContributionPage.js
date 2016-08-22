@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 var Button = require('react-native-button');
 var url = "http://192.168.56.1/pokealert_api/public_api/index.php";
+//var url = "http://localhost.ismaydogmus.fr/pokealert_api/public_api/index.php";
 
 class ContributionPage extends Component {
 
@@ -20,6 +21,7 @@ class ContributionPage extends Component {
             gps: '',
             jsonDataPokemon : [],
         };
+        console.log(this.props.name);
     }
 
     goToHomePage () {

@@ -12,6 +12,7 @@ const accessToken = 'pk.eyJ1IjoiaXNtYTkxIiwiYSI6ImNpczA2bnl3NzAwMDEyem83NTQ0cHN0
 Mapbox.setAccessToken(accessToken);
 var Button = require('react-native-button');
 var url = "http://192.168.56.1/pokealert_api/public_api/index.php";
+//var url = "http://localhost.ismaydogmus.fr/pokealert_api/public_api/index.php";
 
 class ConsultationPage extends Component {
 
@@ -54,20 +55,23 @@ class ConsultationPage extends Component {
                 }).then((responseData) => {
                     responseData = JSON.parse(responseData._bodyInit);
                     this.setState({annotations: []});
-                    console.log(responseData);
                     if (responseData.error !== null) {
                         alert(responseData.error);
                     } else {
-                        for (var i = 0; i < responseData.data.length; i++) {
-                            this.setState({
-                                annotations: [...this.state.annotations, {
-                                    coordinates: [parseFloat(responseData.data[i].latitude), parseFloat(responseData.data[i].longitude)],
-                                    type: "point",
-                                    title: responseData.data[i].name,
-                                    subtitle: "found at " + responseData.data[i].date,
-                                    id: responseData.data[i].id
-                                }]
-                            })
+                        if (responseData.data.length == 0) {
+                            alert("No pokemon in this area !!");
+                        } else {
+                            for (var i = 0; i < responseData.data.length; i++) {
+                                this.setState({
+                                    annotations: [...this.state.annotations, {
+                                        coordinates: [parseFloat(responseData.data[i].latitude), parseFloat(responseData.data[i].longitude)],
+                                        type: "point",
+                                        title: responseData.data[i].name,
+                                        subtitle: "found at " + responseData.data[i].date,
+                                        id: responseData.data[i].id
+                                    }]
+                                })
+                            }
                         }
                         this.setState({
                             annotations: [...this.state.annotations, {
@@ -93,7 +97,6 @@ class ConsultationPage extends Component {
                 }).done();
                 this._map.setCenterCoordinate(position.coords.latitude, position.coords.longitude, true);
                 setTimeout(() => {this._map.easeTo({ pitch : 80})}, 1000);
-                //setTimeout(() => {this._map.setZoomLevel(19)}, 1000);
             },
             (error) => alert("Looks like an error in your GPS : " + error.message),
         );
@@ -125,13 +128,14 @@ class ConsultationPage extends Component {
                     annotations={this.state.annotations}
                     annotationsAreImmutable={true}
                     styleURL={Mapbox.mapStyles.streets}
-                    showsUserLocation={true}
+                    showsUserLocation={false}
                     zoomEnabled={true}
-                    initialZoomLevel={19.6}
+                    initialZoomLevel={19}
                     initialCenterCoordinate={this.state.center}
                     logoIsHidden={true}
                     compassIsHidden={false}
                     onFinishLoadingMap={this.goToActualPosition.bind(this, this.state.interval)}
+                    onUpdateUserLocation={this.goToActualPosition.bind(this, "interval")}
                 />
             </View>
         );

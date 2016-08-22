@@ -10,16 +10,19 @@ import {
 var HomePage = require("./HomePage");
 var ContributionPage = require('./ContributionPage');
 var ConsultationPage = require('./ConsultationPage');
+var InscriptionPage = require('./InscriptionPage');
 
 class Pokealert extends Component {
 
     renderScene(route, navigation) {
         if (route.pageName === "HomePage") {
-            return <HomePage navigator={navigation}/>
+            return <HomePage navigator={navigation} {...route.passProps}/>
         } else if (route.pageName === "ContributionPage") {
-            return <ContributionPage navigator={navigation}/>
+            return <ContributionPage navigator={navigation} {...route.passProps}/>
         } else if (route.pageName === "ConsultationPage") {
-            return <ConsultationPage navigator={navigation}/>
+            return <ConsultationPage navigator={navigation} {...route.passProps}/>
+        } else if (route.pageName === "InscriptionPage") {
+            return <InscriptionPage navigator={navigation} {...route.passProps}/>
         }
     }
 
