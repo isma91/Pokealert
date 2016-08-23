@@ -1,5 +1,4 @@
 <?php
-namespace model;
 /**
 * Bdd.php
 *
@@ -12,7 +11,7 @@ namespace model;
 * @author   isma91 <ismaydogmus@gmail.com>
 * @license  http://opensource.org/licenses/gpl-license.php GNU Public License
 */
-
+namespace model;
 /**
  * Class Bdd to use the database
  *
@@ -58,10 +57,11 @@ Class Bdd
      *
      * @param string $table;         the table name
      * @param array  $fieldAndValue; the array who have the field => $value
+     * @param boolean  $getLastId;     get the id of the insert
      *
-     * @return boolean|PDOStatement
+     * @return boolean|array
      */
-    public function insert ($table, array $fieldAndValue)
+    public function insert ($table, array $fieldAndValue, $getLastId = false)
     {
         $bdd = self::getBdd();
         $query = "INSERT INTO `$table` (";
@@ -77,7 +77,11 @@ Class Bdd
         }
         $query = substr($query, 0, -2) . ");";
         $sql = $bdd->prepare($query);
-        return $sql->execute();
+        if ($getLastId === true) {
+            return array("execute" => $sql->execute(), "lastId" => $bdd->lastInsertId());
+        } else {
+            return $sql->execute();
+        }
     }
     /*
      * Select
@@ -113,5 +117,30 @@ Class Bdd
         } else {
             return false;
         }
+    }
+    /*
+     * Update
+     *
+     * Function to update something in the SQL, return false in FAIL or TRUE in SUCCESS
+     *
+     * @param string $table; the table name
+     * @param string $where; the where statement
+     * @param array  $fieldAndValue; the array who have $field => $value
+     *
+     * @return boolean
+     */
+    public function update ($table, array $fieldAndValue, $where)
+    {
+        $bdd = self::getBdd();
+        $query = "UPDATE $table SET ";
+        foreach ($fieldAndValue as $field => $value) {
+            if (!is_int($value)) {
+                $value = "'$value'";
+            }
+            $query = $query . "$field = $value, ";
+        }
+        $query = substr($query , 0, -2) . " WHERE " . $where;
+        $sql = $bdd->prepare($query);
+        return $sql->execute();
     }
 }
