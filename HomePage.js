@@ -20,6 +20,8 @@ class HomePage extends Component {
             pageName: pageName,
             passProps: {
                 login: this.props.login,
+                token: this.props.token,
+                id: this.props.id,
             }
         })
     }
