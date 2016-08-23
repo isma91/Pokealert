@@ -97,7 +97,7 @@ class UsersController extends User
             self::sendJson("Bad token !! Logout and login to avoid the problem !!", null);
         } else {
             $where = "id = $id";
-            $field = array("contributionId");
+            $field = array("contributionId", "markContribution");
             $userMarkOnContribution = $bdd->select("user", $field, $where);
             self::sendJson(null, $userMarkOnContribution);
         }
