@@ -8,28 +8,77 @@ import {
     View,
 } from 'react-native';
 var Button = require('react-native-button');
-var url = "http://192.168.56.1/pokealert_api/public_api/index.php";
 
 class HomePage extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            username: ""
-        };
     }
+
     navigate (pageName) {
         this.props.navigator.push({
-            pageName: pageName
+            pageName: pageName,
+            passProps: {
+                login: this.props.login,
+            }
         })
     }
 
+    logout () {
+        this.props.navigator.push({
+            pageName: "HomePage",
+            passProps: {
+                id: undefined,
+                login: undefined,
+                token: undefined,
+            }
+        });
+    }
+
+    displayButton () {
+        if (this.props.id === undefined) {
+            return (
+                <View>
+                    <Text style={styles.text}>
+                        To log in, click to the "Connexion" button !!
+                    </Text>
+                    <Button
+                        onPress={this.navigate.bind(this, "ConnexionPage")}
+                        containerStyle={styles.buttonContainer}
+                        style={styles.button}>
+                        Connexion
+                    </Button>
+                </View>
+            );
+        } else {
+            return (
+                <View>
+                    <Text style={styles.text}>
+                        To disconnect, click to the "Logout" button !!
+                    </Text>
+                    <Button
+                        onPress={this.logout.bind(this)}
+                        containerStyle={styles.buttonContainer}
+                        style={styles.button}>
+                        Logout
+                    </Button>
+                </View>
+            );
+        }
+    }
+
     render() {
+        if (this.props.id === undefined) {
+            welcomeUser = "You're not loged yet !!";
+        } else {
+            welcomeUser = "Welcome " + this.props.login + " !!";
+        }
         return (
             <View style={styles.container}>
                 <Text style={styles.title}>
                     Welcome to PokeAlert !!
                 </Text>
+                <Text style={styles.text}>{welcomeUser}</Text>
                 <Text style={styles.text}>
                     To add a Pokemon, click to the "Contribution" button !!
                 </Text>
@@ -57,15 +106,7 @@ class HomePage extends Component {
                     style={styles.button}>
                     Inscription
                 </Button>
-                <Text style={styles.text}>
-                    To login, click to the "Connexion" button !!
-                </Text>
-                <Button
-                    onPress={this.navigate.bind(this, "ConnexionPage")}
-                    containerStyle={styles.buttonContainer}
-                    style={styles.button}>
-                    Connexion
-                </Button>
+                {this.displayButton()}
             </View>
         );
     }
