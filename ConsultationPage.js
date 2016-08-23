@@ -23,14 +23,57 @@ class ConsultationPage extends Component {
             },
             interval : 10,
             annotations: [],
+            login: "",
+            loginToken: "",
+            loginId: 0,
+            jsonDataUserMarkContribution : [],
         };
+    }
+
+    componentWillMount () {
+        if(this.props.login === undefined) {
+            this.setState({login: "anonymous"});
+            this.setState({loginToken: ""});
+            this.setState({loginId: 0});
+        } else {
+            this.setState({login: this.props.login});
+            this.setState({loginToken: this.props.token});
+            this.setState({loginId: this.props.id});
+        }
     }
 
     goToHomePage () {
         this.props.navigator.pop();
     }
 
+    getAllUserMarkOnContribution () {
+        if (this.state.login !== "anonymous") {
+            fetch(GLOBALS.URL, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    action: "getAllUserMarkOnContribution",
+                    id: this.state.loginId,
+                    token: this.state.loginToken,
+                })
+            }).then((responseData) => {
+                responseData = JSON.parse(responseData._bodyInit);
+                this.setState({jsonDataUserMarkContribution: responseData.data[0].contributionId});
+                if (responseData.error !== null) {
+                    alert(responseData.error);
+                } else {
+                }
+            }).catch((error) => {
+                alert("Error while trying to get all your mark on contributions !!\n" + error);
+            }).done();
+        }
+    }
+
     goToActualPosition (key, value) {
+        this.getAllUserMarkOnContribution();
         if (value == undefined) {
             value = 10;
         }
@@ -60,15 +103,18 @@ class ConsultationPage extends Component {
                             alert("No pokemon in this area !!");
                         } else {
                             for (var i = 0; i < responseData.data.length; i++) {
-                                this.setState({
-                                    annotations: [...this.state.annotations, {
-                                        coordinates: [parseFloat(responseData.data[i].latitude), parseFloat(responseData.data[i].longitude)],
-                                        type: "point",
-                                        title: responseData.data[i].name,
-                                        subtitle: "found at " + responseData.data[i].date,
-                                        id: responseData.data[i].id
-                                    }]
-                                })
+                                //convert string to array of explode ";" and check if id = data[i].id => can't voted, else he can vote
+                                if (this.state.jsonDataUserMarkContribution !== null) {
+                                    this.setState({
+                                        annotations: [...this.state.annotations, {
+                                            coordinates: [parseFloat(responseData.data[i].latitude), parseFloat(responseData.data[i].longitude)],
+                                            type: "point",
+                                            title: responseData.data[i].name,
+                                            subtitle: "found at " + responseData.data[i].date + " by " + responseData.data[i].username,
+                                            id: responseData.data[i].id
+                                        }]
+                                    });
+                                }
                             }
                         }
                         this.setState({
@@ -101,11 +147,18 @@ class ConsultationPage extends Component {
     }
 
     render() {
+        var user = this.state.login;
+        if(user === "anonymous") {
+            userWarning = <Text style={styles.textWarning}>You're not connected !! You can't add or remove a mark on contributions !!!</Text>;
+        } else {
+            userWarning = <Text style={styles.text}>Here's the list of pokemon in your area {user} !!</Text>;
+        }
         return (
             <View style={styles.container}>
                 <Text style={styles.title}>
                     Welcome to the Consultation Page !!
                 </Text>
+                {userWarning}
                 <Button
                     onPress={this.goToHomePage.bind(this)}
                     containerStyle={styles.buttonContainer}
@@ -128,7 +181,7 @@ class ConsultationPage extends Component {
                     styleURL={Mapbox.mapStyles.streets}
                     showsUserLocation={false}
                     zoomEnabled={true}
-                    initialZoomLevel={19}
+                    initialZoomLevel={18}
                     initialCenterCoordinate={this.state.center}
                     logoIsHidden={true}
                     compassIsHidden={false}
@@ -152,6 +205,20 @@ const styles = StyleSheet.create({
         fontSize: 20,
         textAlign: 'center',
         margin: 10,
+    },
+
+    textWarning : {
+        textAlign: 'center',
+        fontSize: 15,
+        marginTop: 10,
+        marginBottom: 10,
+        color: "#FF0000",
+    },
+    text: {
+        textAlign: 'center',
+        fontSize: 15,
+        marginTop: 10,
+        marginBottom: 10,
     },
     buttonContainer : {
         marginTop: 10,
