@@ -70,13 +70,15 @@ class ConsultationPage extends Component {
                 alert("Error while trying to get all your mark on contributions !!\n" + error);
             }).done();
         }
+        return this.state.jsonDataUserMarkContribution;
     }
 
     goToActualPosition (key, value) {
-        this.getAllUserMarkOnContribution();
+        var userAllMarkContribution = String(this.getAllUserMarkOnContribution());
         if (value == undefined) {
             value = 10;
         }
+        console.log(userAllMarkContribution);
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 position = JSON.stringify(position);
