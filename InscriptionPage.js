@@ -9,7 +9,7 @@ import {
     Navigator,
 } from 'react-native';
 var Button = require('react-native-button');
-var url = "http://192.168.56.1/pokealert_api/public_api/index.php";
+var GLOBALS = require('./Globals');
 
 class InscriptionPage extends Component {
 
@@ -30,19 +30,22 @@ class InscriptionPage extends Component {
 
      signUp () {
          errorSignUp = "";
-         if (this.state.firstName.trim() !== "") {
+         if (this.state.firstName.trim() === "") {
              errorSignUp = errorSignUp + "Firstname empty !!\n";
          }
-         if (this.state.lastName.trim() !== "") {
+         if (this.state.lastName.trim() === "") {
              errorSignUp = errorSignUp + "Lastname empty !!\n";
          }
-         if (this.state.login.trim() !== "") {
+         if (this.state.login.trim() === "") {
              errorSignUp = errorSignUp + "Login empty !!\n";
          }
-         if (this.state.password !== "") {
+         if (this.state.login.trim() === "anonymous") {
+             errorSignUp = errorSignUp + "This login can't be taked !!\n";
+         }
+         if (this.state.password === "") {
              errorSignUp = errorSignUp + "Password empty !!\n";
          }
-         if (this.state.confirmPassword !== "") {
+         if (this.state.confirmPassword === "") {
              errorSignUp = errorSignUp + "Confirm Password empty !!\n";
          }
          if (errorSignUp !== "") {
@@ -51,14 +54,14 @@ class InscriptionPage extends Component {
              if (this.state.password !== this.state.confirmPassword) {
                  alert("Password and Confirm Password are not the same !!");
              } else {
-                 fetch(url, {
+                 fetch(GLOBALS.URL, {
                      method: 'POST',
                      headers: {
                          'Accept': 'application/json',
                          'Content-Type': 'application/json'
                      },
                      body: JSON.stringify({
-                         action: "singUp",
+                         action: "signUp",
                          lastname: this.state.lastName,
                          firstname: this.state.firstName,
                          login: this.state.login,
@@ -67,13 +70,14 @@ class InscriptionPage extends Component {
                      })
                  }).then((responseData) => {
                      responseData = JSON.parse(responseData._bodyInit);
-                     if (responseData.error !== null) {
-                         alert("Error while trying to get pokemon name !!\n" + responseData.error);
+                     if(responseData.error !== null) {
+                         alert(responseData.error);
                      } else {
-                         this.state.jsonDataPokemon = responseData.data;
+                         alert("You are successfully registred !! You are now redirected to the Home page !!");
+                         this.props.navigator.pop();
                      }
                  }).catch((error) => {
-                     alert("Error while trying to get pokemon name !!\n" + error);
+                     alert("Error while trying to add the account to the server !!\n" + error);
                  }).done();
              }
          }
@@ -92,9 +96,6 @@ class InscriptionPage extends Component {
                         style={styles.button}>
                         Back to the Home Page
                     </Button>
-                    <Text style={styles.text}>
-                        Fill this form to sign up !!
-                    </Text>
                     <Text style={styles.text}></Text>
                     <Text style={styles.text}>Lastname</Text>
                     <TextInput
