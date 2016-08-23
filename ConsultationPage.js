@@ -61,24 +61,24 @@ class ConsultationPage extends Component {
                 })
             }).then((responseData) => {
                 responseData = JSON.parse(responseData._bodyInit);
-                this.setState({jsonDataUserMarkContribution: responseData.data[0].contributionId});
                 if (responseData.error !== null) {
                     alert(responseData.error);
                 } else {
+                    this.state.jsonDataUserMarkContribution = responseData.data;
                 }
             }).catch((error) => {
                 alert("Error while trying to get all your mark on contributions !!\n" + error);
             }).done();
         }
-        return this.state.jsonDataUserMarkContribution;
     }
 
     goToActualPosition (key, value) {
-        var userAllMarkContribution = String(this.getAllUserMarkOnContribution());
+        this.getAllUserMarkOnContribution();
         if (value == undefined) {
             value = 10;
         }
-        console.log(userAllMarkContribution);
+        //@TODO: the user can't mark his own contribution
+        console.log(this.state.jsonDataUserMarkContribution)
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 position = JSON.stringify(position);
