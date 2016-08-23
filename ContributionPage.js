@@ -9,8 +9,7 @@ import {
     Navigator,
 } from 'react-native';
 var Button = require('react-native-button');
-var url = "http://192.168.56.1/pokealert_api/public_api/index.php";
-//var url = "http://localhost.ismaydogmus.fr/pokealert_api/public_api/index.php";
+var GLOBALS = require('./Globals');
 
 class ContributionPage extends Component {
 
@@ -18,10 +17,17 @@ class ContributionPage extends Component {
         super(props);
         this.state = {
             pokemonName : "",
-            gps: '',
             jsonDataPokemon : [],
+            login: "",
         };
-        console.log(this.props.name);
+    }
+
+    componentWillMount () {
+        if(this.props.login === undefined) {
+            this.setState({login: "anonymous"});
+        } else {
+            this.setState({login: this.props.login});
+        }
     }
 
     goToHomePage () {
@@ -30,7 +36,7 @@ class ContributionPage extends Component {
 
     findPokemonByName(pokemonName) {
         if (pokemonName.trim() !== "") {
-            fetch(url, {
+            fetch(GLOBALS.URL, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -53,7 +59,7 @@ class ContributionPage extends Component {
         }
     }
 
-    static sendPokemon(pokemon) {
+    static sendPokemon(pokemon, login) {
         if (pokemon === null || isNaN(pokemon) || pokemon.trim() === "") {
             alert("The Pokemon name can't be empty !!");
         } else {
@@ -62,7 +68,7 @@ class ContributionPage extends Component {
                 (position) => {
                     position = JSON.stringify(position);
                     position = JSON.parse(position);
-                    fetch(url, {
+                    fetch(GLOBALS.URL, {
                         method: 'POST',
                         headers: {
                             'Accept': 'application/json',
@@ -70,7 +76,7 @@ class ContributionPage extends Component {
                         },
                         body: JSON.stringify({
                             action: "sendPokemon",
-                            user: "anonymous",
+                            user: login,
                             date: new Date().toISOString().slice(0, 19).replace('T', ' '),
                             latitude: parseFloat(position.coords.latitude.toString().substr(0, 7)),
                             longitude: parseFloat(position.coords.longitude.toString().substr(0, 6)),
@@ -94,13 +100,19 @@ class ContributionPage extends Component {
     };
 
     render() {
+        var user = this.state.login;
+        if(this.props.login === "anonymous") {
+            userWarning = <Text style={styles.textWarning}>You're not connected !! All you're contribution are gonna be added as anonymous</Text>;
+        } else {
+            userWarning = <Text style={styles.text}>Let's contribute {this.props.login} !!</Text>;
+        }
         contentPokemon = this.state.jsonDataPokemon.map(function (pokemon) {
             return (
                 <View Key={pokemon.id}>
                     <Button
                         style={styles.button}
                         containerStyle={styles.buttonContainer}
-                        onPress={ContributionPage.sendPokemon.bind(this, pokemon.id)}>
+                        onPress={ContributionPage.sendPokemon.bind(this, pokemon.id, user)}>
                         {pokemon.name}
                     </Button>
                 </View>
@@ -112,6 +124,7 @@ class ContributionPage extends Component {
                     <Text style={styles.title}>
                         Welcome to the Contribution Page !!
                     </Text>
+                    {userWarning}
                     <Button
                         onPress={this.goToHomePage.bind(this)}
                         containerStyle={styles.buttonContainer}
@@ -143,6 +156,13 @@ const styles = StyleSheet.create({
         fontSize: 20,
         textAlign: 'center',
         margin: 10,
+    },
+    textWarning : {
+        textAlign: 'center',
+        fontSize: 15,
+        marginTop: 10,
+        marginBottom: 10,
+        color: "#FF0000",
     },
     text: {
         textAlign: 'center',
