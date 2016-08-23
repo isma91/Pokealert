@@ -101,10 +101,10 @@ class ContributionPage extends Component {
 
     render() {
         var user = this.state.login;
-        if(this.props.login === "anonymous") {
+        if(user === "anonymous") {
             userWarning = <Text style={styles.textWarning}>You're not connected !! All you're contribution are gonna be added as anonymous</Text>;
         } else {
-            userWarning = <Text style={styles.text}>Let's contribute {this.props.login} !!</Text>;
+            userWarning = <Text style={styles.text}>Let's contribute {user} !!</Text>;
         }
         contentPokemon = this.state.jsonDataPokemon.map(function (pokemon) {
             return (
