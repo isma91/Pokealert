@@ -8,11 +8,9 @@ import {
     Navigator,
     Picker,
 } from 'react-native';
-const accessToken = 'pk.eyJ1IjoiaXNtYTkxIiwiYSI6ImNpczA2bnl3NzAwMDEyem83NTQ0cHN0dTMifQ.grfJLqkKt9cjpAQusLI9_w';
-Mapbox.setAccessToken(accessToken);
+var GLOBALS = require('./Globals');
 var Button = require('react-native-button');
-var url = "http://192.168.56.1/pokealert_api/public_api/index.php";
-//var url = "http://localhost.ismaydogmus.fr/pokealert_api/public_api/index.php";
+Mapbox.setAccessToken(GLOBALS.MAPTOKEN);
 
 class ConsultationPage extends Component {
 
@@ -40,7 +38,7 @@ class ConsultationPage extends Component {
             (position) => {
                 position = JSON.stringify(position);
                 position = JSON.parse(position);
-                fetch(url, {
+                fetch(GLOBALS.URL, {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
