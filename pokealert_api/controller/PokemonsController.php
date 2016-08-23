@@ -29,9 +29,17 @@ Class PokemonsController extends Pokemon
     public function sendPokemon ($pokemonId, $user, $date, $latitude, $longitude)
     {
         $bdd = new Bdd();
+        $fieldUser = array("contributionId");
+        $whereUser = "login = '" . $user . "'";
+        $contributionUser = $bdd->select('user', $fieldUser, $whereUser)[0];
+        $contributionUser = $contributionUser["contributionId"];
         $arrayFieldAndValue = array("username" => $user, "latitude" => $latitude, "longitude" => $longitude, "date" => $date, "pokemonId" => $pokemonId);
-        $sql = $bdd->insert('contribution', $arrayFieldAndValue);
-        if ($sql) {
+        $sqlContributionPokemon = $bdd->insert('contribution', $arrayFieldAndValue, true);
+        $lastId = $sqlContributionPokemon["lastId"];
+        $fieldContributionUser = array("contributionId" => $contributionUser . $lastId . ";");
+        $whereContributionUser = "login = '" . $user . "'";
+        $sqlContributionUser = $bdd->update('user', $fieldContributionUser, $whereContributionUser);
+        if ($sqlContributionPokemon["execute"] === true && $sqlContributionUser === true) {
             self::sendJson(null, null);
         } else {
             self::sendJson("Error wile adding your contribution !!", null);
@@ -67,7 +75,7 @@ Class PokemonsController extends Pokemon
         $innerJoin = array(
             array("table" => "pokemon", "on" => "contribution.pokemonId = pokemon.id")
         );
-        $where = "(contribution.latitude >= $minLatitude AND contribution.longitude <= $maxLongitude AND contribution.date >= '" . "$intervalDate" . "') OR (contribution.latitude = $latitude AND contribution.longitude >= $maxLongitude AND contribution.date >= '" . "$intervalDate" . "') OR (contribution.latitude <= $minLatitude AND contribution.longitude >= $maxLongitude AND contribution.date >= '" . "$intervalDate" . "') OR (contribution.latitude >= $minLatitude AND contribution.longitude = $longitude AND contribution.date >= '" . "$intervalDate" . "') OR (contribution.latitude >= $minLatitude AND contribution.longitude = $longitude AND contribution.date >= '" . "$intervalDate" . "') OR (contribution.latitude <= $maxLatitude AND contribution.longitude >= $minLongitude AND contribution.date >= '" . "$intervalDate" . "') OR (contribution.latitude = $latitude AND contribution.longitude >= $minLongitude AND contribution.date >= '" . "$intervalDate" . "') OR (contribution.latitude <= $maxLatitude AND contribution.longitude >= $minLongitude AND contribution.date >= '" . "$intervalDate" . "')";
+        $where = "(contribution.latitude >= $minLatitude AND contribution.longitude <= $maxLongitude AND contribution.date >= '" . "$intervalDate" . "' AND contribution.score < 9) OR (contribution.latitude = $latitude AND contribution.longitude >= $maxLongitude AND contribution.date >= '" . "$intervalDate" . "' AND contribution.score < 9) OR (contribution.latitude <= $minLatitude AND contribution.longitude >= $maxLongitude AND contribution.date >= '" . "$intervalDate" . "' AND contribution.score < 9) OR (contribution.latitude >= $minLatitude AND contribution.longitude = $longitude AND contribution.date >= '" . "$intervalDate" . "' AND contribution.score < 9) OR (contribution.latitude >= $minLatitude AND contribution.longitude = $longitude AND contribution.date >= '" . "$intervalDate" . "' AND contribution.score < 9) OR (contribution.latitude <= $maxLatitude AND contribution.longitude >= $minLongitude AND contribution.date >= '" . "$intervalDate" . "' AND contribution.score < 9) OR (contribution.latitude = $latitude AND contribution.longitude >= $minLongitude AND contribution.date >= '" . "$intervalDate" . "' AND contribution.score < 9) OR (contribution.latitude <= $maxLatitude AND contribution.longitude >= $minLongitude AND contribution.date >= '" . "$intervalDate" . "' AND contribution.score < 9)";
         $findAllPokemonInArea = $bdd->select("contribution", $field, $where, $innerJoin);
         self::sendJson(null, $findAllPokemonInArea);
     }
