@@ -43,6 +43,12 @@ if (empty($json)) {
         case 'getAllUserMarkOnContribution':
         $user->getAllUserMarkOnContribution($json["id"], $json["token"]);
         break;
+        case 'removeMark':
+        $user->removeMark($json['idLogin'], $json['idContribution'], $json["tokenLogin"]);
+        break;
+        case 'addMark':
+        $user->addMark($json['idLogin'], $json['idContribution'], $json["tokenLogin"]);
+        break;
         case '':
         echo json_encode(array('error' => "Not a valid action !!", "data" => null));
         break;
