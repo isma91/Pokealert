@@ -7,6 +7,7 @@ import {
     TextInput,
     ScrollView,
     Navigator,
+    Alert,
 } from 'react-native';
 var Button = require('react-native-button');
 var GLOBALS = require('./Globals');
@@ -49,12 +50,12 @@ class ContributionPage extends Component {
             }).then((responseData) => {
                 responseData = JSON.parse(responseData._bodyInit);
                 if (responseData.error !== null) {
-                    alert("Error while trying to get pokemon name !!\n" + responseData.error);
+                    Alert.alert("Error while trying to get pokemon name !!", responseData.error);
                 } else {
                     this.state.jsonDataPokemon = responseData.data;
                 }
             }).catch((error) => {
-                alert("Error while trying to get pokemon name !!\n" + error);
+                Alert.alert("Error", "Error while trying to get pokemon name !!\n" + error.message);
             }).done();
         }
     }
@@ -85,15 +86,15 @@ class ContributionPage extends Component {
                     }).then((responseData) => {
                         responseData = JSON.parse(responseData._bodyInit);
                         if (responseData.error !== null) {
-                            alert(responseData.error);
+                            Alert.alert("Error !!", responseData.error);
                         } else {
-                            alert("Contribution done successfully !!");
+                            Alert.alert("Success !!", "Contribution done successfully !!");
                         }
                     }).catch((error) => {
-                        console.warn(error);
+                        Alert.alert("Error !!", error);
                     }).done();
                 },
-                (error) => alert("Looks like an error in your GPS : " + error.message),
+                (error) => Alert.alert("Error !!", "Looks like an error in your GPS : " + error.message),
                 {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000}
             );
         }

@@ -7,6 +7,7 @@ import {
     TextInput,
     ScrollView,
     Navigator,
+    Alert,
 } from 'react-native';
 var Button = require('react-native-button');
 var GLOBALS = require('./Globals');
@@ -34,7 +35,7 @@ class ConnexionPage extends Component {
             errorLogIn = errorLogIn + "Password empty !!\n";
         }
         if (errorLogIn !== "") {
-            alert(errorLogIn);
+            Alert.alert("Some trouble here !!", errorLogIn);
         } else {
             fetch(GLOBALS.URL, {
                 method: 'POST',
@@ -50,9 +51,9 @@ class ConnexionPage extends Component {
             }).then((responseData) => {
                 responseData = JSON.parse(responseData._bodyInit);
                 if(responseData.error !== null) {
-                    alert(responseData.error);
+                    Alert.alert("Error !!", responseData.error);
                 } else {
-                    alert("You are successfully loged !! You are now redirected to the Home page !!");
+                    Alert.alert("Connexion Success !!", "You are successfully loged !! You are now redirected to the Home page !!");
                     this.props.navigator.push({
                         pageName: "HomePage",
                         passProps: {
@@ -63,7 +64,7 @@ class ConnexionPage extends Component {
                     });
                 }
             }).catch((error) => {
-                alert("Error while trying to log in !!\n" + error);
+                Alert.alert("Error", "Error while trying to log in !!" + error.message);
             }).done();
         }
     }
