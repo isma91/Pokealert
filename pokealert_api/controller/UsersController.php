@@ -81,7 +81,7 @@ class UsersController extends User
             return false;
         }
         if (!$this->_updateToken($user['id'])) {
-            self::sendJson("A problem occurred when we create a token for you !! Please contact the admin of the application !!", null);
+            self::sendJson("Bad token !! Logout and login to avoid the problem !!", null);
         } else  {
             $where2 = "login = '" . $login . "'";
             $field2 = array("id", "login", "token");
@@ -101,6 +101,70 @@ class UsersController extends User
             $userMarkOnContribution = $bdd->select("user", $field, $where);
             self::sendJson(null, $userMarkOnContribution);
         }
+    }
+
+    public function addMark($idLogin, $idContribution, $token)
+    {
+        $idLogin = (int)$idLogin;
+        $idContribution = (int)$idContribution;
+        $bdd = new Bdd();
+        if(!$this->_checkToken($idLogin, $token)) {
+            self::sendJson("Bad token !! Logout and login to avoid the problem !!", null);
+        } else {
+            $fieldUser = array("markContribution");
+            $whereUser = "id = $idLogin";
+            $markContributionUser = $bdd->select('user', $fieldUser, $whereUser)[0];
+            $markContributionUser = $markContributionUser["markContribution"];
+
+            $fieldContribution = array('score');
+            $whereContribution = "id = $idContribution";
+            $scoreContribution = $bdd->select("contribution", $fieldContribution, $whereContribution)[0];
+            $scoreContribution = (int)$scoreContribution["score"];
+            $scoreContributionPlusOne = $scoreContribution + 1;
+            $fieldUserUpdate = array("markContribution" => $markContributionUser . $idContribution . ";");
+            $whereUserUpdate = "id = $idLogin";
+            $updateUser = $bdd->update('user', $fieldUserUpdate, $whereUserUpdate);
+            $fieldContributionUpdate = array("score" => $scoreContributionPlusOne);
+            $whereContributionUpdate = "id = $idContribution";
+            $updateContribution = $bdd->update('contribution', $fieldContributionUpdate, $whereContributionUpdate);
+            if($updateUser === true && $updateContribution === true) {
+                self::sendJson(null, null);
+            } else {
+                self::sendJson("Error while adding mark on this contribution", null);
+            }
+        }
+    }
+
+    public function removeMark($idLogin, $idContribution, $token)
+    {
+        $idLogin = (int)$idLogin;
+                $idContribution = (int)$idContribution;
+                $bdd = new Bdd();
+                if(!$this->_checkToken($idLogin, $token)) {
+                    self::sendJson("Bad token !! Logout and login to avoid the problem !!", null);
+                } else {
+                    $fieldUser = array("markContribution");
+                    $whereUser = "id = $idLogin";
+                    $markContributionUser = $bdd->select('user', $fieldUser, $whereUser)[0];
+                    $markContributionUser = $markContributionUser["markContribution"];
+
+                    $fieldContribution = array('score');
+                    $whereContribution = "id = $idContribution";
+                    $scoreContribution = $bdd->select("contribution", $fieldContribution, $whereContribution)[0];
+                    $scoreContribution = (int)$scoreContribution["score"];
+                    $scoreContributionMinusOne = $scoreContribution - 1;
+                    $fieldUserUpdate = array("markContribution" => $markContributionUser . $idContribution . ";");
+                    $whereUserUpdate = "id = $idLogin";
+                    $updateUser = $bdd->update('user', $fieldUserUpdate, $whereUserUpdate);
+                    $fieldContributionUpdate = array("score" => $scoreContributionMinusOne);
+                    $whereContributionUpdate = "id = $idContribution";
+                    $updateContribution = $bdd->update('contribution', $fieldContributionUpdate, $whereContributionUpdate);
+                    if($updateUser === true && $updateContribution === true) {
+                        self::sendJson(null, null);
+                    } else {
+                        self::sendJson("Error while adding mark on this contribution", null);
+                    }
+                }
     }
 
     /*public function editLogin($id, $oldLogin, $newLogin, $token)
