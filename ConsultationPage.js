@@ -7,6 +7,7 @@ import {
     View,
     Navigator,
     Picker,
+    Alert,
 } from 'react-native';
 var GLOBALS = require('./Globals');
 var Button = require('react-native-button');
@@ -62,13 +63,113 @@ class ConsultationPage extends Component {
             }).then((responseData) => {
                 responseData = JSON.parse(responseData._bodyInit);
                 if (responseData.error !== null) {
-                    alert(responseData.error);
+                    Alert.alert("Error !!", responseData.error);
                 } else {
                     this.state.jsonDataUserMarkContribution = responseData.data;
                 }
             }).catch((error) => {
-                alert("Error while trying to get all your mark on contributions !!\n" + error);
+                Alert.alert("Error", "Error while trying to get all your mark on contributions !!" + error.message);
             }).done();
+        }
+    }
+
+    addMark(idContribution) {
+        if (this.state.login !== "anonymous") {
+            fetch(GLOBALS.URL, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    action: "addMark",
+                    idLogin: this.state.loginId,
+                    idContribution: idContribution,
+                    tokenLogin: this.state.loginToken
+                })
+            }).then((responseData) => {
+                responseData = JSON.parse(responseData._bodyInit);
+                if (responseData.error !== null) {
+                    Alert.alert("Error !!", responseData.error);
+                } else {
+                    this.goToActualPosition.bind(this, "interval");
+                }
+            }).catch((error) => {
+                Alert.alert("Error", "Error while trying to add your mark on contributions !!" + error.message);
+            }).done();
+        }
+        console.log(idContribution);
+    }
+
+    removeMark(idContribution) {
+        if (this.state.login !== "anonymous") {
+            fetch(GLOBALS.URL, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    action: "removeMark",
+                    idLogin: this.state.loginId,
+                    idContribution: idContribution,
+                    tokenLogin: this.state.loginToken
+                })
+            }).then((responseData) => {
+                responseData = JSON.parse(responseData._bodyInit);
+                if (responseData.error !== null) {
+                    Alert.alert("Error !!", responseData.error);
+                } else {
+                    this.goToActualPosition.bind(this, "interval");
+                }
+            }).catch((error) => {
+                Alert.alert("Error", "Error while trying to remove your mark on contributions !!" + error.message);
+            }).done();
+        }
+    }
+
+    sendMark = (annotation) => {
+        if (this.state.login === "anonymous") {
+            Alert.alert("Not connected !!", 'Pokemon => ' + annotation.title + ", " + annotation.subtitle);
+        } else {
+            var canContribuateMark = true;
+            var canContribuateContribution = true;
+            var userContributions = [];
+            var userMarkContribution = [];
+            if (this.state.jsonDataUserMarkContribution.length > 0) {
+                if (this.state.jsonDataUserMarkContribution[0].contributionId !== null) {
+                    userContributions = this.state.jsonDataUserMarkContribution[0].contributionId.split(';').filter(value => value != "");
+                }
+                if (this.state.jsonDataUserMarkContribution[0].markContribution !== null) {
+                    userMarkContribution = this.state.jsonDataUserMarkContribution[0].markContribution.split(';').filter(value => value != "");
+                }
+            }
+            if (userMarkContribution.length == 0) {
+                canContribuateMark = true;
+            } else {
+                for (var i = 0; i < userMarkContribution.length; i++) {
+                    console.log(userMarkContribution[i]);
+                    if(userMarkContribution[i] == annotation.id) {
+                        canContribuateMark = false;
+                    }
+                }
+            }
+            if (userContributions.length == 0) {
+                canContribuateContribution = true;
+            } else {
+                for (var i = 0; i < userContributions.length; i++) {
+                    if(userContributions[i] == annotation.id) {
+                        canContribuateContribution = false;
+                    }
+                }
+            }
+            if(canContribuateMark === true && canContribuateContribution === true) {
+                Alert.alert("Mark a contribution", "Pokemon => " + annotation.title + ", " + annotation.subtitle, [{text: "+ 1", onPress: () => this.addMark(annotation.id)}, {text: "- 1", onPress: () => this.RemoveMark(annotation.id)}]);
+            } else if (canContribuateMark === true) {
+                Alert.alert("You already mark on this contribution !!", "Pokemon => " + annotation.title + ", " + annotation.subtitle);
+            } else {
+                Alert.alert("You can't contribuate your own contribution !!", "Pokemon => " + annotation.title + ", " + annotation.subtitle);
+            }
         }
     }
 
@@ -77,8 +178,16 @@ class ConsultationPage extends Component {
         if (value == undefined) {
             value = 10;
         }
-        //@TODO: the user can't mark his own contribution
-        console.log(this.state.jsonDataUserMarkContribution)
+        var userContributions = [];
+        var userMarkContribution = [];
+        if (this.state.jsonDataUserMarkContribution.length > 0) {
+            if (this.state.jsonDataUserMarkContribution[0].contributionId !== null) {
+                userContributions = this.state.jsonDataUserMarkContribution[0].contributionId.split(';').filter(value => value != "");
+            }
+            if (this.state.jsonDataUserMarkContribution[0].markContribution !== null) {
+                userMarkContribution = this.state.jsonDataUserMarkContribution[0].markContribution.split(';').filter(value => value != "");
+            }
+        }
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 position = JSON.stringify(position);
@@ -99,20 +208,38 @@ class ConsultationPage extends Component {
                     responseData = JSON.parse(responseData._bodyInit);
                     this.setState({annotations: []});
                     if (responseData.error !== null) {
-                        alert(responseData.error);
+                        Alert.alert("Error !!", responseData.error);
                     } else {
                         if (responseData.data.length == 0) {
-                            alert("No pokemon in this area !!");
+                            Alert.alert("No pokemon in this area !!", "Need to go elsewhere !!");
                         } else {
-                            for (var i = 0; i < responseData.data.length; i++) {
-                                //convert string to array of explode ";" and check if id = data[i].id => can't voted, else he can vote
-                                if (this.state.jsonDataUserMarkContribution !== null) {
+                            if (userContributions.length > 0) {
+                                for (var j = 0; j < userContributions.length; j++) {
+                                    for (var i = 0; i < responseData.data.length; i++) {
+                                        if (userContributions[j] == responseData.data[i].id) {
+                                            subtitleMarker = "You found him at " + responseData.data[i].date  + "\n Score => " + responseData.data[i].score;
+                                        } else {
+                                            subtitleMarker = "found at " + responseData.data[i].date + " by " + responseData.data[i].username + "\n Score => " + responseData.data[i].score;
+                                        }
+                                        this.setState({
+                                            annotations: [...this.state.annotations, {
+                                                coordinates: [parseFloat(responseData.data[i].latitude), parseFloat(responseData.data[i].longitude)],
+                                                type: "point",
+                                                title: responseData.data[i].name,
+                                                subtitle: subtitleMarker,
+                                                id: responseData.data[i].id
+                                            }]
+                                        });
+                                    }
+                                }
+                            } else {
+                                for (var i = 0; i < responseData.data.length; i++) {
                                     this.setState({
                                         annotations: [...this.state.annotations, {
                                             coordinates: [parseFloat(responseData.data[i].latitude), parseFloat(responseData.data[i].longitude)],
                                             type: "point",
                                             title: responseData.data[i].name,
-                                            subtitle: "found at " + responseData.data[i].date + " by " + responseData.data[i].username,
+                                            subtitle: "found at " + responseData.data[i].date + " by " + responseData.data[i].username + "\n Score => " + responseData.data[i].score,
                                             id: responseData.data[i].id
                                         }]
                                     });
@@ -139,12 +266,12 @@ class ConsultationPage extends Component {
                         });
                     }
                 }).catch((error) => {
-                    alert("Error while trying to get all pokemon in your area !!\n" + error);
+                    Alert.alert("Error while trying to get all pokemon in your area !!", error);
                 }).done();
                 this._map.setCenterCoordinate(position.coords.latitude, position.coords.longitude, true);
                 setTimeout(() => {this._map.easeTo({ pitch : 80})}, 1000);
             },
-            (error) => alert("Looks like an error in your GPS : " + error.message),
+            (error) => Alert.alert("Error !!", "Looks like an error in your GPS" + error.message),
         );
     }
 
@@ -189,6 +316,7 @@ class ConsultationPage extends Component {
                     compassIsHidden={false}
                     onFinishLoadingMap={this.goToActualPosition.bind(this, this.state.interval)}
                     onUpdateUserLocation={this.goToActualPosition.bind(this, "interval")}
+                    onOpenAnnotation={this.sendMark.bind(this)}
                 />
             </View>
         );
