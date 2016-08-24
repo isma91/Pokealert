@@ -7,6 +7,7 @@ import {
     TextInput,
     ScrollView,
     Navigator,
+    Alert,
 } from 'react-native';
 var Button = require('react-native-button');
 var GLOBALS = require('./Globals');
@@ -49,10 +50,10 @@ class InscriptionPage extends Component {
              errorSignUp = errorSignUp + "Confirm Password empty !!\n";
          }
          if (errorSignUp !== "") {
-             alert(errorSignUp);
+             Alert.alert("Some trouble here !!", errorSignUp);
          } else {
              if (this.state.password !== this.state.confirmPassword) {
-                 alert("Password and Confirm Password are not the same !!");
+                 Alert.alert("Some trouble here !!", "Password and Confirm Password are not the same !!");
              } else {
                  fetch(GLOBALS.URL, {
                      method: 'POST',
@@ -71,13 +72,13 @@ class InscriptionPage extends Component {
                  }).then((responseData) => {
                      responseData = JSON.parse(responseData._bodyInit);
                      if(responseData.error !== null) {
-                         alert(responseData.error);
+                         Aert.alert("Error !!", responseData.error);
                      } else {
-                         alert("You are successfully registred !! You are now redirected to the Home page !!");
+                         Alert.alert("Success !!", "You are successfully registred !! You are now redirected to the Home page !!");
                          this.props.navigator.pop();
                      }
                  }).catch((error) => {
-                     alert("Error while trying to add the account to the server !!\n" + error);
+                     Alert.alert("Error !!", "Error while trying to add the account to the server !!" + error.message);
                  }).done();
              }
          }
