@@ -50,7 +50,10 @@ if (empty($json)) {
             $user->addMark($json['idLogin'], $json['idContribution'], $json["tokenLogin"]);
             break;
         case 'getUserProfile':
-            $user->getUserProfile($json["idLogin"], $json["tokenLogin"]);
+            $user->getUserProfile($json["idLogin"]);
+            break;
+        case 'findAllLoginByName':
+            $user->findAllLoginByName($json["login"]);
             break;
         case '':
             echo json_encode(array('error' => "Not a valid action !!", "data" => null));
