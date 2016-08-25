@@ -87,7 +87,7 @@ class ProfilePage extends Component {
         if (userContribution.length === 0) {
             contentUserContribution = <View>
                 <Text style={styles.text}>
-                    You don't contribute yet !!
+                    You didn't have contributed yet !!
                 </Text>
             </View>;
         } else {
@@ -95,7 +95,7 @@ class ProfilePage extends Component {
                 return (
                     <View Key={contribution.id}>
                         <Text style={styles.text}>
-                            You contribute the pokemon {contribution.pokemon} at {contribution.date} with an actuall score of {contribution.score}
+                            You contributed for the pokemon {contribution.pokemon} at {contribution.date} with an actuall score of {contribution.score}
                         </Text>
                     </View>
                 );
@@ -105,7 +105,7 @@ class ProfilePage extends Component {
         if(userMarkContribution.length === 0) {
             contentUserMarkContribution = <View>
                 <Text style={styles.text}>
-                    You don't vote to a contribution yet !!
+                    You didn't have voted to a contribution yet !!
                 </Text>
             </View>;
         } else {
@@ -113,7 +113,7 @@ class ProfilePage extends Component {
                 return (
                     <View Key={markContribution.id}>
                         <Text style={styles.text}>
-                            You vote the contribution of {markContribution.login} who find a {markContribution.pokemon} at {markContribution.date}
+                            You voted for the contribution of {markContribution.login} who found a {markContribution.pokemon} at {markContribution.date}
                         </Text>
                     </View>
                 );
