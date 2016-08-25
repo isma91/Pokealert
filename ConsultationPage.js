@@ -166,9 +166,7 @@ class ConsultationPage extends Component {
             if(canContribuateMark === true && canContribuateContribution === true) {
                 Alert.alert("Mark a contribution", "Pokemon => " + annotation.title + ", " + annotation.subtitle, [{text: "+ 1", onPress: () => this.addMark(annotation.id)}, {text: "- 1", onPress: () => this.RemoveMark(annotation.id)}]);
             } else if (canContribuateMark === true) {
-                Alert.alert("You already mark on this contribution !!", "Pokemon => " + annotation.title + ", " + annotation.subtitle);
-            } else {
-                Alert.alert("You can't contribuate your own contribution !!", "Pokemon => " + annotation.title + ", " + annotation.subtitle);
+                Alert.alert("This contribution is yours or you already voted !!", "Pokemon => " + annotation.title + ", " + annotation.subtitle);
             }
         }
     }
