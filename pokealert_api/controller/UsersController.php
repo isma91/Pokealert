@@ -115,7 +115,6 @@ class UsersController extends User
             $whereUser = "id = $idLogin";
             $markContributionUser = $bdd->select('user', $fieldUser, $whereUser)[0];
             $markContributionUser = $markContributionUser["markContribution"];
-
             $fieldContribution = array('score');
             $whereContribution = "id = $idContribution";
             $scoreContribution = $bdd->select("contribution", $fieldContribution, $whereContribution)[0];
@@ -138,85 +137,63 @@ class UsersController extends User
     public function removeMark($idLogin, $idContribution, $token)
     {
         $idLogin = (int)$idLogin;
-                $idContribution = (int)$idContribution;
-                $bdd = new Bdd();
-                if(!$this->_checkToken($idLogin, $token)) {
-                    self::sendJson("Bad token !! Logout and login to avoid the problem !!", null);
-                } else {
-                    $fieldUser = array("markContribution");
-                    $whereUser = "id = $idLogin";
-                    $markContributionUser = $bdd->select('user', $fieldUser, $whereUser)[0];
-                    $markContributionUser = $markContributionUser["markContribution"];
-
-                    $fieldContribution = array('score');
-                    $whereContribution = "id = $idContribution";
-                    $scoreContribution = $bdd->select("contribution", $fieldContribution, $whereContribution)[0];
-                    $scoreContribution = (int)$scoreContribution["score"];
-                    $scoreContributionMinusOne = $scoreContribution - 1;
-                    $fieldUserUpdate = array("markContribution" => $markContributionUser . $idContribution . ";");
-                    $whereUserUpdate = "id = $idLogin";
-                    $updateUser = $bdd->update('user', $fieldUserUpdate, $whereUserUpdate);
-                    $fieldContributionUpdate = array("score" => $scoreContributionMinusOne);
-                    $whereContributionUpdate = "id = $idContribution";
-                    $updateContribution = $bdd->update('contribution', $fieldContributionUpdate, $whereContributionUpdate);
-                    if($updateUser === true && $updateContribution === true) {
-                        self::sendJson(null, null);
-                    } else {
-                        self::sendJson("Error while adding mark on this contribution", null);
-                    }
-                }
-    }
-
-    /*public function editLogin($id, $oldLogin, $newLogin, $token)
-    {
+        $idContribution = (int)$idContribution;
         $bdd = new Bdd();
-        if (!$this->_checkToken($token)) {
+        if(!$this->_checkToken($idLogin, $token)) {
             self::sendJson("Bad token !! Logout and login to avoid the problem !!", null);
-            return false;
-        }
-        $getOldLogin = $bdd->getBdd()->prepare("SELECT login FROM users WHERE id = :id");
-        $getOldLogin->bindParam(":id", $id);
-        $getOldLogin->execute();
-        $userOldLogin = $getOldLogin->fetch(\PDO::FETCH_ASSOC);
-        if ($userOldLogin["login"] !== $old_login) {
-            self::sendJson("Bad old login !!", null);
-            return false;
-        }
-        $updateLogin = $bdd->getBdd()->prepare('UPDATE users SET login = :login WHERE id = :id');
-        $updateLogin->bindParam(":login", $new_login);
-        $updateLogin->bindParam(":id", $id);
-        if (!$updateLogin->execute()) {
-            self::sendJson("A problem occurred when we update your login !! Please contact the admin of the application !!", null);
         } else {
-            self::sendJson(null, null);
+            $fieldUser = array("markContribution");
+            $whereUser = "id = $idLogin";
+            $markContributionUser = $bdd->select('user', $fieldUser, $whereUser)[0];
+            $markContributionUser = $markContributionUser["markContribution"];
+            $fieldContribution = array('score');
+            $whereContribution = "id = $idContribution";
+            $scoreContribution = $bdd->select("contribution", $fieldContribution, $whereContribution)[0];
+            $scoreContribution = (int)$scoreContribution["score"];
+            $scoreContributionMinusOne = $scoreContribution - 1;
+            $fieldUserUpdate = array("markContribution" => $markContributionUser . $idContribution . ";");
+            $whereUserUpdate = "id = $idLogin";
+            $updateUser = $bdd->update('user', $fieldUserUpdate, $whereUserUpdate);
+            $fieldContributionUpdate = array("score" => $scoreContributionMinusOne);
+            $whereContributionUpdate = "id = $idContribution";
+            $updateContribution = $bdd->update('contribution', $fieldContributionUpdate, $whereContributionUpdate);
+            if($updateUser === true && $updateContribution === true) {
+                self::sendJson(null, null);
+            } else {
+                self::sendJson("Error while adding mark on this contribution", null);
+            }
         }
     }
 
-    public function editPassword($id, $oldPassword, $newPassword, $token)
+    public function getUserProfile ($id)
     {
         $bdd = new Bdd();
-        if (!$this->_checkToken($token)) {
-            self::sendJson("Bad token !! Logout and login to avoid the problem !!", null);
-            return false;
+        $field = array("user.lastname", "user.firstname", "user.login", "user.markContribution", "contribution.date", "contribution.score", "pokemon.name");
+        $where = "user.id = $id";
+        $innerJoin = array(
+            array("table" => "contribution", "on" => "contribution.username = user.login"),
+            array("table" => "pokemon", "on" => "pokemon.id = contribution.pokemonId")
+         );
+        $userProfile = $bdd->select("user", $field, $where, $innerJoin);
+        $arrayListMarkContribution = array();
+        if(count($userProfile) !== 0) {
+            $listMarkContributionUser = explode(";", $userProfile[0]["markContribution"]);
+            $fieldUser = array("contribution.username", "contribution.date", "contribution.score", "pokemon.name");
+            $innerJoinUser = array(
+                array("table" => "pokemon", "on" => "pokemon.id = contribution.pokemonId")
+            );
+            foreach ($listMarkContributionUser as $idContribution) {
+                $whereUser = "contribution.id = $idContribution";
+                $userMarkContribution = $bdd->select('contribution', $fieldUser, $whereUser, $innerJoinUser);
+                $arrayListMarkContribution[] = $userMarkContribution;
+            }
         }
-        $getOldPassword = $bdd->getBdd()->prepare("SELECT pass FROM users WHERE id = :id");
-        $getOldPassword->bindParam(":id", $id);
-        $getOldPassword->execute();
-        $user_old_password = $getOldPassword->fetch(\PDO::FETCH_ASSOC);
-        if (!$this->_checkPassword($old_password, $user_old_password["pass"])) {
-            self::sendJson("Bad old password !!", null);
-            return false;
-        }
-        $newPassword = $this->_hashPassword($newPassword);
-        $updatePassword = $bdd->getBdd()->prepare('UPDATE users SET pass = :pass WHERE id = :id');
-        $updatePassword->bindParam(":pass", $newPassword);
-        $updatePassword->bindParam(":id", $id);
-        if (!$updatePassword->execute()) {
-            self::sendJson("A problem occurred when we update your password !! Please contact the admin of the application !!", null);
+        if (!is_array($userProfile)) {
+            self::sendJson("Error while trying to get your profile !!", null);
         } else {
-            self::sendJson(null, null);
+            self::sendJson(null, array("userProfile" => $userProfile, "markContribution" => $arrayListMarkContribution));
         }
-    }*/
+    }
 
     private function _updateToken($id)
     {
@@ -254,23 +231,4 @@ class UsersController extends User
             return false;
         }
     }
-
-    public function logout($id, $token)
-    {
-        $bdd = new Bdd();
-        $field = array("token");
-        $where = "id = $id";
-        $userToken = $bdd->select("user", $field, $where);
-        /*$getToken = $bdd->getBdd()->prepare('SELECT token FROM users WHERE id = :id');
-        $getToken->bindParam(':id', $id);
-        $getToken->execute();
-        $userToken = $getToken->fetch(\PDO::FETCH_ASSOC);*/
-        if ($userToken["token"] === $token) {
-            //set the token to null
-            self::sendJson(null, null);
-        } else {
-            self::sendJson("Bad token !! Please delete the cache of the application !!", null);
-        }
-    }
-
 }
