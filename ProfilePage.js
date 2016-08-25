@@ -17,11 +17,11 @@ class ProfilePage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            firstName: "",
-            lastName: "",
-            login: "",
-            userContribution: [],
-            userMarkContribution : [],
+            ownFirstName: "",
+            ownLastName: "",
+            ownLogin: "",
+            ownUserContribution: [],
+            ownUserMarkContribution : [],
         }
     }
 
@@ -45,27 +45,34 @@ class ProfilePage extends Component {
             if (responseData.error !== null) {
                 Alert.alert("Error !!", responseData.error);
             } else {
-                if(responseData.data.userProfile.length === 0) {
-                    Alert.alert("Wrong login !!", "This user doesn't exist !!");
-                } else {
-                    this.setState({firstName: responseData.data.userProfile[0].firstname});
-                    this.setState({lastName: responseData.data.userProfile[0].lastname});
-                    this.setState({login: responseData.data.userProfile[0].login});
-                    if (responseData.data.userProfile[0].markContribution === null) {
-                        this.setState({userMarkContribution: []});
-                    }
-                    var jsonDataUserCotribution = [];
-                    for(var i = 0; i < responseData.data.userProfile.length; i++) {
-                        jsonDataUserCotribution.push({
-                            pokemon: responseData.data.userProfile[i].name,
-                            date: responseData.data.userProfile[i].date,
-                            score: responseData.data.userProfile[i].score,
+                this.setState({ownFirstName: responseData.data.profile.firstname});
+                this.setState({ownLastName: responseData.data.profile.lastname});
+                this.setState({ownLogin: responseData.data.profile.login});
+                var jsonDataUserContribution = [];
+                var jsonDataUserMarkContribution = [];
+                if (responseData.data.contribution.length !== 0) {
+                    for(var i = 0; i < responseData.data.contribution.length; i++) {
+                        jsonDataUserContribution.push({
+                            id: responseData.data.contribution[i][0].id,
+                            pokemon: responseData.data.contribution[i][0].name,
+                            date: responseData.data.contribution[i][0].date,
+                            score: responseData.data.contribution[i][0].score,
                         });
                     }
-                    this.setState({userContribution: jsonDataUserCotribution});
-                    console.log(responseData.data.markContribution.length);
-                    console.log(responseData.data.markContribution);
                 }
+                if(responseData.data.mark.length !== 0) {
+                    for (var j = 0; j < responseData.data.mark.length - 1; j++) {
+                        jsonDataUserMarkContribution.push({
+                            id: responseData.data.mark[j][0].id,
+                            login: responseData.data.mark[j][0].username,
+                            date: responseData.data.mark[j][0].date,
+                            pokemon: responseData.data.mark[j][0].name,
+                        });
+                    }
+                    this.setState({ownUserMarkContribution: jsonDataUserMarkContribution});
+                }
+                this.setState({ownUserContribution: jsonDataUserContribution});
+                //console.log(this.state);
             }
         }).catch((error) => {
             Alert.alert("Error", "Error while trying to get your profile !!" + error.message);
@@ -77,6 +84,42 @@ class ProfilePage extends Component {
     }
 
     render() {
+        var userContribution = this.state.ownUserContribution;
+        if (userContribution.length === 0) {
+            contentUserContribution = <View>
+                <Text style={styles.text}>
+                    You don't contribute yet !!
+                </Text>
+            </View>;
+        } else {
+            contentUserContribution = userContribution.map(function(contribution) {
+                return (
+                    <View Key={contribution.id}>
+                        <Text style={styles.text}>
+                            You contribute the pokemon {contribution.pokemon} at {contribution.date} with an actuall score of {contribution.score}
+                        </Text>
+                    </View>
+                );
+            });
+        }
+        var userMarkContribution = this.state.ownUserMarkContribution;
+        if(userMarkContribution.length === 0) {
+            contentUserMarkContribution = <View>
+                <Text style={styles.text}>
+                    You don't vote to a contribution yet !!
+                </Text>
+            </View>;
+        } else {
+            contentUserMarkContribution = userMarkContribution.map(function(markContribution) {
+                return (
+                    <View Key={markContribution.id}>
+                        <Text style={styles.text}>
+                            You vote the contribution of {markContribution.login} who find a {markContribution.pokemon} at {markContribution.date}
+                        </Text>
+                    </View>
+                );
+            });
+        }
         return (
             <View style={styles.container}>
                 <ScrollView>
@@ -89,9 +132,17 @@ class ProfilePage extends Component {
                         style={styles.button}>
                         Back to the Home Page
                     </Button>
-                    <Text style={styles.text}>Lastname => </Text>
-                    <Text style={styles.text}>Firstname => </Text>
-                    <Text style={styles.text}>Login => </Text>
+                    <Text style={styles.text}>Lastname => {this.state.ownFirstName}</Text>
+                    <Text style={styles.text}>Firstname => {this.state.ownLastName}</Text>
+                    <Text style={styles.text}>Login => {this.state.ownLogin}</Text>
+                    <Text style={styles.text}>
+                        Here is the list of all your contribution !!
+                    </Text>
+                    {contentUserContribution}
+                    <Text style={styles.text}>
+                        Here is the list of all your vote on contributions !!
+                    </Text>
+                    {contentUserMarkContribution}
                 </ScrollView>
             </View>
         );
