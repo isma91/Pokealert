@@ -42,9 +42,6 @@ class HomePage extends Component {
         if (this.props.id === undefined) {
             return (
                 <View>
-                    <Text style={styles.text}>
-                        To log in, click to the "Connexion" button !!
-                    </Text>
                     <Button
                         onPress={this.navigate.bind(this, "ConnexionPage")}
                         containerStyle={styles.buttonContainer}
@@ -56,23 +53,23 @@ class HomePage extends Component {
         } else {
             return (
                 <View>
-                    <Text style={styles.text}>
-                        To disconnect, click to the "Logout" button !!
-                    </Text>
                     <Button
                         onPress={this.logout.bind(this)}
                         containerStyle={styles.buttonContainer}
                         style={styles.button}>
                         Logout
                     </Button>
-                    <Text style={styles.text}>
-                        You can check your profile or see someone else's profile
-                    </Text>
                     <Button
                         onPress={this.navigate.bind(this, "ProfilePage")}
                         containerStyle={styles.buttonContainer}
                         style={styles.button}>
                         Profile
+                    </Button>
+                    <Button
+                        onPress={this.navigate.bind(this, "SearchProfilePage")}
+                        containerStyle={styles.buttonContainer}
+                        style={styles.button}>
+                        Search Profile
                     </Button>
                 </View>
             );
@@ -92,27 +89,18 @@ class HomePage extends Component {
                         Welcome to PokeAlert !!
                     </Text>
                     <Text style={styles.text}>{welcomeUser}</Text>
-                    <Text style={styles.text}>
-                        To add a Pokemon, click to the "Contribution" button !!
-                    </Text>
                     <Button
                         onPress={this.navigate.bind(this, "ContributionPage")}
                         containerStyle={styles.buttonContainer}
                         style={styles.button}>
-                        Contribution
+                        Add Pokemon
                     </Button>
-                    <Text style={styles.text}>
-                        To add see all Pokemon in your area, click to the "Consultation" button !!
-                    </Text>
                     <Button
                         onPress={this.navigate.bind(this, "ConsultationPage")}
                         containerStyle={styles.buttonContainer}
                         style={styles.button}>
-                        Consultation
+                        See Map
                     </Button>
-                    <Text style={styles.text}>
-                        To sign up, click to the "Inscription" button !!
-                    </Text>
                     <Button
                         onPress={this.navigate.bind(this, "InscriptionPage")}
                         containerStyle={styles.buttonContainer}
@@ -137,6 +125,7 @@ const styles = StyleSheet.create({
         margin: 10,
     },
     text: {
+        fontWeight: 'bold',
         textAlign: 'center',
         fontSize: 15,
         marginTop: 10,
