@@ -12,6 +12,7 @@ var ContributionPage = require('./ContributionPage');
 var ConsultationPage = require('./ConsultationPage');
 var InscriptionPage = require('./InscriptionPage');
 var ConnexionPage = require('./ConnexionPage');
+var ProfilePage = require('./ProfilePage');
 
 class Pokealert extends Component {
 
@@ -26,6 +27,8 @@ class Pokealert extends Component {
             return <InscriptionPage navigator={navigation} {...route.passProps}/>
         } else if (route.pageName === "ConnexionPage") {
             return <ConnexionPage navigator={navigation} {...route.passProps}/>
+        } else if (route.pageName === "ProfilePage") {
+            return <ProfilePage navigator={navigation} {...route.passProps}/>
         }
     }
 
