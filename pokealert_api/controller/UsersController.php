@@ -168,31 +168,55 @@ class UsersController extends User
     public function getUserProfile ($id)
     {
         $bdd = new Bdd();
-        $field = array("user.lastname", "user.firstname", "user.login", "user.markContribution", "contribution.date", "contribution.score", "pokemon.name");
+        $user = array("profile" => [], "contribution" => [], "mark" => []);
+        $field = array("lastname", "firstname", "login", "contributionId", "markContribution");
         $where = "user.id = $id";
-        $innerJoin = array(
-            array("table" => "contribution", "on" => "contribution.username = user.login"),
-            array("table" => "pokemon", "on" => "pokemon.id = contribution.pokemonId")
-         );
-        $userProfile = $bdd->select("user", $field, $where, $innerJoin);
-        $arrayListMarkContribution = array();
-        if(count($userProfile) !== 0) {
-            $listMarkContributionUser = explode(";", $userProfile[0]["markContribution"]);
-            $fieldUser = array("contribution.username", "contribution.date", "contribution.score", "pokemon.name");
-            $innerJoinUser = array(
-                array("table" => "pokemon", "on" => "pokemon.id = contribution.pokemonId")
-            );
-            foreach ($listMarkContributionUser as $idContribution) {
-                $whereUser = "contribution.id = $idContribution";
-                $userMarkContribution = $bdd->select('contribution', $fieldUser, $whereUser, $innerJoinUser);
-                $arrayListMarkContribution[] = $userMarkContribution;
-            }
+        $user["profile"] = $bdd->select("user", $field, $where)[0];
+        if($user["profile"]["contributionId"] !== null) {
+            $userContribution = explode(";", $user["profile"]["contributionId"]);
+            $user["contribution"] = $this->getUserContribution($userContribution);
         }
-        if (!is_array($userProfile)) {
+        if($user["profile"]["markContribution"] !== null) {
+            $userMarkContribution = explode(";", $user["profile"]["markContribution"]);
+            $user["mark"] = $this->getUserMarkContribution($userMarkContribution);
+        }
+        if (!is_array($user["profile"])) {
             self::sendJson("Error while trying to get your profile !!", null);
         } else {
-            self::sendJson(null, array("userProfile" => $userProfile, "markContribution" => $arrayListMarkContribution));
+            self::sendJson(null, $user);
         }
+    }
+
+    public function getUserContribution(array $arrayContribution)
+    {
+        $bdd = new Bdd();
+        array_pop($arrayContribution);
+        $userContribution = array();
+        $field = array("contribution.id", "contribution.date", "contribution.score", "pokemon.name");
+        $innerJoin = array(
+            array("table" => "pokemon", "on" => "pokemon.id = contribution.pokemonId")
+        );
+        foreach ($arrayContribution as $contributionId) {
+            $where = "contribution.id = $contributionId";
+            $userContribution[] = $bdd->select('contribution', $field, $where, $innerJoin);
+        }
+        return $userContribution;
+    }
+
+    public function getUserMarkContribution(array $arrayMarkContribution)
+    {
+        $bdd = new Bdd();
+        array_pop($arrayMarkContribution);
+        $userMarkContribution = array();
+        $field = array("contribution.id", "contribution.username", "contribution.date", "contribution.score", "pokemon.name");
+        $innerJoin = array(
+            array("table" => "pokemon", "on" => "pokemon.id = contribution.pokemonId")
+        );
+        foreach ($arrayMarkContribution as $markContributionId) {
+            $where = "contribution.id = $markContributionId";
+            $userMarkContribution[] = $bdd->select('contribution', $field, $where, $innerJoin);
+        }
+        return $userMarkContribution;
     }
 
     private function _updateToken($id)
