@@ -219,6 +219,16 @@ class UsersController extends User
         return $userMarkContribution;
     }
 
+    public function findAllLoginByName($login)
+    {
+        $bdd = new Bdd();
+        $login = '%' . $login . '%';
+        $field = array("id", "login");
+        $where = "login LIKE '" . "$login" . "'";
+        $findAllLogin = $bdd->select('user', $field, $where);
+        self::sendJson(null, $findAllLogin);
+    }
+
     private function _updateToken($id)
     {
         $bdd = new Bdd();
