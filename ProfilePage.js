@@ -17,11 +17,11 @@ class ProfilePage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            ownFirstName: "",
-            ownLastName: "",
-            ownLogin: "",
-            ownUserContribution: [],
-            ownUserMarkContribution : [],
+            firstName: "",
+            lastName: "",
+            login: "",
+            userContribution: [],
+            userMarkContribution : [],
         }
     }
 
@@ -45,9 +45,9 @@ class ProfilePage extends Component {
             if (responseData.error !== null) {
                 Alert.alert("Error !!", responseData.error);
             } else {
-                this.setState({ownFirstName: responseData.data.profile.firstname});
-                this.setState({ownLastName: responseData.data.profile.lastname});
-                this.setState({ownLogin: responseData.data.profile.login});
+                this.setState({firstName: responseData.data.profile.firstname});
+                this.setState({lastName: responseData.data.profile.lastname});
+                this.setState({login: responseData.data.profile.login});
                 var jsonDataUserContribution = [];
                 var jsonDataUserMarkContribution = [];
                 if (responseData.data.contribution.length !== 0) {
@@ -69,10 +69,9 @@ class ProfilePage extends Component {
                             pokemon: responseData.data.mark[j][0].name,
                         });
                     }
-                    this.setState({ownUserMarkContribution: jsonDataUserMarkContribution});
+                    this.setState({userMarkContribution: jsonDataUserMarkContribution});
                 }
-                this.setState({ownUserContribution: jsonDataUserContribution});
-                //console.log(this.state);
+                this.setState({userContribution: jsonDataUserContribution});
             }
         }).catch((error) => {
             Alert.alert("Error", "Error while trying to get your profile !!" + error.message);
@@ -84,7 +83,7 @@ class ProfilePage extends Component {
     }
 
     render() {
-        var userContribution = this.state.ownUserContribution;
+        var userContribution = this.state.userContribution;
         if (userContribution.length === 0) {
             contentUserContribution = <View>
                 <Text style={styles.text}>
@@ -102,7 +101,7 @@ class ProfilePage extends Component {
                 );
             });
         }
-        var userMarkContribution = this.state.ownUserMarkContribution;
+        var userMarkContribution = this.state.userMarkContribution;
         if(userMarkContribution.length === 0) {
             contentUserMarkContribution = <View>
                 <Text style={styles.text}>
@@ -132,14 +131,14 @@ class ProfilePage extends Component {
                         style={styles.button}>
                         Back to the Home Page
                     </Button>
-                    <Text style={styles.text}>Lastname => {this.state.ownFirstName}</Text>
-                    <Text style={styles.text}>Firstname => {this.state.ownLastName}</Text>
-                    <Text style={styles.text}>Login => {this.state.ownLogin}</Text>
-                    <Text style={styles.text}>
+                    <Text style={styles.text}>Lastname => {this.state.firstName}</Text>
+                    <Text style={styles.text}>Firstname => {this.state.lastName}</Text>
+                    <Text style={styles.text}>Login => {this.state.login}</Text>
+                    <Text style={styles.textBold}>
                         Here is the list of all your contribution !!
                     </Text>
                     {contentUserContribution}
-                    <Text style={styles.text}>
+                    <Text style={styles.textBold}>
                         Here is the list of all your vote on contributions !!
                     </Text>
                     {contentUserMarkContribution}
@@ -160,6 +159,13 @@ const styles = StyleSheet.create({
         margin: 10,
     },
     text: {
+        textAlign: 'center',
+        fontSize: 15,
+        marginTop: 10,
+        marginBottom: 10,
+    },
+    textBold: {
+        fontWeight : 'bold',
         textAlign: 'center',
         fontSize: 15,
         marginTop: 10,
