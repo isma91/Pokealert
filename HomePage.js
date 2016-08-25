@@ -6,6 +6,7 @@ import {
     Text,
     TextInput,
     View,
+    ScrollView,
 } from 'react-native';
 var Button = require('react-native-button');
 
@@ -64,6 +65,15 @@ class HomePage extends Component {
                         style={styles.button}>
                         Logout
                     </Button>
+                    <Text style={styles.text}>
+                        You can check your profile or see someone else's profile
+                    </Text>
+                    <Button
+                        onPress={this.navigate.bind(this, "ProfilePage")}
+                        containerStyle={styles.buttonContainer}
+                        style={styles.button}>
+                        Profile
+                    </Button>
                 </View>
             );
         }
@@ -77,38 +87,40 @@ class HomePage extends Component {
         }
         return (
             <View style={styles.container}>
-                <Text style={styles.title}>
-                    Welcome to PokeAlert !!
-                </Text>
-                <Text style={styles.text}>{welcomeUser}</Text>
-                <Text style={styles.text}>
-                    To add a Pokemon, click to the "Contribution" button !!
-                </Text>
-                <Button
-                    onPress={this.navigate.bind(this, "ContributionPage")}
-                    containerStyle={styles.buttonContainer}
-                    style={styles.button}>
-                    Contribution
-                </Button>
-                <Text style={styles.text}>
-                    To add see all Pokemon in your area, click to the "Consultation" button !!
-                </Text>
-                <Button
-                    onPress={this.navigate.bind(this, "ConsultationPage")}
-                    containerStyle={styles.buttonContainer}
-                    style={styles.button}>
-                    Consultation
-                </Button>
-                <Text style={styles.text}>
-                    To sign up, click to the "Inscription" button !!
-                </Text>
-                <Button
-                    onPress={this.navigate.bind(this, "InscriptionPage")}
-                    containerStyle={styles.buttonContainer}
-                    style={styles.button}>
-                    Inscription
-                </Button>
-                {this.displayButton()}
+                <ScrollView>
+                    <Text style={styles.title}>
+                        Welcome to PokeAlert !!
+                    </Text>
+                    <Text style={styles.text}>{welcomeUser}</Text>
+                    <Text style={styles.text}>
+                        To add a Pokemon, click to the "Contribution" button !!
+                    </Text>
+                    <Button
+                        onPress={this.navigate.bind(this, "ContributionPage")}
+                        containerStyle={styles.buttonContainer}
+                        style={styles.button}>
+                        Contribution
+                    </Button>
+                    <Text style={styles.text}>
+                        To add see all Pokemon in your area, click to the "Consultation" button !!
+                    </Text>
+                    <Button
+                        onPress={this.navigate.bind(this, "ConsultationPage")}
+                        containerStyle={styles.buttonContainer}
+                        style={styles.button}>
+                        Consultation
+                    </Button>
+                    <Text style={styles.text}>
+                        To sign up, click to the "Inscription" button !!
+                    </Text>
+                    <Button
+                        onPress={this.navigate.bind(this, "InscriptionPage")}
+                        containerStyle={styles.buttonContainer}
+                        style={styles.button}>
+                        Inscription
+                    </Button>
+                    {this.displayButton()}
+                </ScrollView>
             </View>
         );
     }
