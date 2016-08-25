@@ -26,37 +26,40 @@ if (empty($json)) {
 } else {
     switch ($json["action"]) {
         case 'sendPokemon':
-        $pokemon->sendPokemon($json["idPokemon"], $json["user"], $json["date"], $json["latitude"], $json["longitude"]);
-        break;
+            $pokemon->sendPokemon($json["idPokemon"], $json["user"], $json["date"], $json["latitude"], $json["longitude"]);
+            break;
         case 'findAllPokemonByName':
-        $pokemon->findAllPokemonByName($json["pokemon"]);
-        break;
+            $pokemon->findAllPokemonByName($json["pokemon"]);
+            break;
         case 'findAllPokemonByLocation':
-        $pokemon->findAllPokemonByLocation($json["latitude"], $json["longitude"], $json["interval"]);
-        break;
+            $pokemon->findAllPokemonByLocation($json["latitude"], $json["longitude"], $json["interval"]);
+            break;
         case 'signUp':
-        $user->create($json["lastname"], $json["firstname"], $json["login"], $json["password"], $json["confirmPassword"]);
-        break;
+            $user->create($json["lastname"], $json["firstname"], $json["login"], $json["password"], $json["confirmPassword"]);
+            break;
         case 'logIn':
-        $user->connexion($json["login"], $json["password"]);
-        break;
+            $user->connexion($json["login"], $json["password"]);
+            break;
         case 'getAllUserMarkOnContribution':
-        $user->getAllUserMarkOnContribution($json["id"], $json["token"]);
-        break;
+            $user->getAllUserMarkOnContribution($json["id"], $json["token"]);
+            break;
         case 'removeMark':
-        $user->removeMark($json['idLogin'], $json['idContribution'], $json["tokenLogin"]);
-        break;
+            $user->removeMark($json['idLogin'], $json['idContribution'], $json["tokenLogin"]);
+            break;
         case 'addMark':
-        $user->addMark($json['idLogin'], $json['idContribution'], $json["tokenLogin"]);
-        break;
+            $user->addMark($json['idLogin'], $json['idContribution'], $json["tokenLogin"]);
+            break;
+        case 'getUserProfile':
+            $user->getUserProfile($json["idLogin"], $json["tokenLogin"]);
+            break;
         case '':
-        echo json_encode(array('error' => "Not a valid action !!", "data" => null));
-        break;
+            echo json_encode(array('error' => "Not a valid action !!", "data" => null));
+            break;
         case null:
-        echo json_encode(array('error' => "Not a valid action !!", "data" => null));
-        break;
+            echo json_encode(array('error' => "Not a valid action !!", "data" => null));
+            break;
         default:
-        echo json_encode(array('error' => "Not a valid action !!", "data" => null));
-        break;
+            echo json_encode(array('error' => "Not a valid action !!", "data" => null));
+            break;
     }
 }
