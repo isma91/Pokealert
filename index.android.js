@@ -14,6 +14,7 @@ var InscriptionPage = require('./InscriptionPage');
 var ConnexionPage = require('./ConnexionPage');
 var ProfilePage = require('./ProfilePage');
 var SearchProfilePage = require('./SearchProfilePage');
+var WantedPokemonPage = require('./WantedPokemonPage');
 
 class Pokealert extends Component {
 
@@ -32,6 +33,8 @@ class Pokealert extends Component {
             return <ProfilePage navigator={navigation} {...route.passProps}/>
         } else if (route.pageName === "SearchProfilePage") {
             return <SearchProfilePage navigator={navigation} {...route.passProps}/>
+        } else if (route.pageName === "WantedPokemonPage") {
+            return <WantedPokemonPage navigator={navigation} {...route.passProps}/>
         }
     }
 
