@@ -22,6 +22,7 @@ class ProfilePage extends Component {
             login: "",
             userContribution: [],
             userMarkContribution : [],
+            userWantedList : [],
         }
     }
 
@@ -50,6 +51,7 @@ class ProfilePage extends Component {
                 this.setState({login: responseData.data.profile.login});
                 var jsonDataUserContribution = [];
                 var jsonDataUserMarkContribution = [];
+                var jsonDataWantedList = [];
                 if (responseData.data.contribution.length !== 0) {
                     for(var i = 0; i < responseData.data.contribution.length; i++) {
                         jsonDataUserContribution.push({
@@ -61,7 +63,7 @@ class ProfilePage extends Component {
                     }
                 }
                 if(responseData.data.mark.length !== 0) {
-                    for (var j = 0; j < responseData.data.mark.length - 1; j++) {
+                    for (var j = 0; j < responseData.data.mark.length; j++) {
                         jsonDataUserMarkContribution.push({
                             id: responseData.data.mark[j][0].id,
                             login: responseData.data.mark[j][0].username,
@@ -70,6 +72,15 @@ class ProfilePage extends Component {
                         });
                     }
                     this.setState({userMarkContribution: jsonDataUserMarkContribution});
+                }
+                if(responseData.data.wanted.length !== 0) {
+                    for (var k = 0; k < responseData.data.wanted.length; k++) {
+                        jsonDataWantedList.push({
+                            id: responseData.data.wanted[k][0].id,
+                            name: responseData.data.wanted[k][0].name,
+                        });
+                    }
+                    this.setState({userWantedList: jsonDataWantedList});
                 }
                 this.setState({userContribution: jsonDataUserContribution});
             }
@@ -119,6 +130,24 @@ class ProfilePage extends Component {
                 );
             });
         }
+        var userWantedList = this.state.userWantedList;
+        if(userWantedList.length === 0) {
+            contentUserWantedList = <View>
+                <Text style={styles.text}>
+                    You didn't add a pokemon in your wanted list !!
+                </Text>
+            </View>;
+        } else {
+            contentUserWantedList = userWantedList.map(function(wantedList) {
+                return (
+                    <View Key={wantedList.id}>
+                        <Text style={styles.text}>
+                            You wanted {wantedList.name}
+                        </Text>
+                    </View>
+                );
+            });
+        }
         return (
             <View style={styles.container}>
                 <ScrollView>
@@ -142,6 +171,10 @@ class ProfilePage extends Component {
                         Here is the list of all your vote on contributions !!
                     </Text>
                     {contentUserMarkContribution}
+                    <Text style={styles.textBold}>
+                        Here is the list of your pokemon wanted list !!
+                    </Text>
+                    {contentUserWantedList}
                 </ScrollView>
             </View>
         );

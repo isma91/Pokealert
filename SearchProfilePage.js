@@ -22,6 +22,7 @@ class SearchProfilePage extends Component {
             login: "",
             userContribution: [],
             userMarkContribution : [],
+            userWantedList : [],
             jsonDataLogin: [],
             userSearch : "",
         }
@@ -77,6 +78,7 @@ class SearchProfilePage extends Component {
                 this.setState({firstName: responseData.data.profile.firstname});
                 var jsonDataUserContribution = [];
                 var jsonDataUserMarkContribution = [];
+                var jsonDataWantedList = [];
                 if (responseData.data.contribution.length !== 0) {
                     for(var i = 0; i < responseData.data.contribution.length; i++) {
                         jsonDataUserContribution.push({
@@ -97,6 +99,15 @@ class SearchProfilePage extends Component {
                         });
                     }
                     this.setState({userMarkContribution: jsonDataUserMarkContribution});
+                }
+                if(responseData.data.wanted.length !== 0) {
+                    for (var k = 0; k < responseData.data.wanted.length; k++) {
+                        jsonDataWantedList.push({
+                            id: responseData.data.wanted[k][0].id,
+                            name: responseData.data.wanted[k][0].name,
+                        });
+                    }
+                    this.setState({userWantedList: jsonDataWantedList});
                 }
                 this.setState({userContribution: jsonDataUserContribution});
             }
@@ -126,6 +137,7 @@ class SearchProfilePage extends Component {
         var userContribution = this.state.userContribution;
         contentUserContribution = <View></View>;
         contentUserMarkContribution = <View></View>;
+        contentUserWantedList = <View></View>;
         if(lastname !== '') {
             contentUser = <View>
                 <Text style={styles.textBold}>
@@ -175,6 +187,24 @@ class SearchProfilePage extends Component {
                     </Text>
                 </View>;
             }
+            var userWantedList = this.state.userWantedList;
+            if(userWantedList.length !== 0) {
+                contentUserWantedList = userWantedList.map(function(wantedList) {
+                    return (
+                        <View Key={wantedList.id}>
+                            <Text style={styles.text}>
+                                Wanted {wantedList.name}
+                            </Text>
+                        </View>
+                    );
+                });
+            } else {
+                contentUserWantedList = <View>
+                    <Text style={styles.text}>
+                        No pokemon in his wanted list !!
+                    </Text>
+                </View>;
+            }
         }
         return (
             <View style={styles.container}>
@@ -198,6 +228,7 @@ class SearchProfilePage extends Component {
                     {contentUser}
                     {contentUserContribution}
                     {contentUserMarkContribution}
+                    {contentUserWantedList}
                 </ScrollView>
             </View>
         );
