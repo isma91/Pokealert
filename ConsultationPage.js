@@ -12,6 +12,7 @@ import {
 var GLOBALS = require('./Globals');
 var Button = require('react-native-button');
 Mapbox.setAccessToken(GLOBALS.MAPTOKEN);
+var PushNotification = require('react-native-push-notification');
 
 class ConsultationPage extends Component {
 
@@ -28,7 +29,15 @@ class ConsultationPage extends Component {
             loginToken: "",
             loginId: 0,
             jsonDataUserMarkContribution : [],
+            jsonDataUserWantedList : [],
         };
+        PushNotification.configure({
+            onNotification: function(notification) {
+                console.log( 'NOTIFICATION:', notification );
+            },
+            popInitialNotification: true,
+            requestPermissions: true,
+        });
     }
 
     componentWillMount () {
@@ -40,6 +49,35 @@ class ConsultationPage extends Component {
             this.setState({login: this.props.login});
             this.setState({loginToken: this.props.token});
             this.setState({loginId: this.props.id});
+            fetch(GLOBALS.URL, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    action: "getUserProfile",
+                    idLogin: this.props.id,
+                })
+            }).then((responseData) => {
+                responseData = JSON.parse(responseData._bodyInit);
+                if (responseData.error !== null) {
+                    Alert.alert("Error !!", responseData.error);
+                } else {
+                    var jsonDataWantedList = [];
+                    if(responseData.data.wanted.length !== 0) {
+                        for (var k = 0; k < responseData.data.wanted.length; k++) {
+                            jsonDataWantedList.push({
+                                id: responseData.data.wanted[k][0].id,
+                                name: responseData.data.wanted[k][0].name,
+                            });
+                        }
+                        this.setState({jsonDataUserWantedList: jsonDataWantedList});
+                    }
+                }
+            }).catch((error) => {
+                Alert.alert("Error", "Error while trying to get your pokemon wanted list !!" + error.message);
+            }).done();
         }
     }
 
@@ -98,7 +136,6 @@ class ConsultationPage extends Component {
                 Alert.alert("Error", "Error while trying to add your mark on contributions !!" + error.message);
             }).done();
         }
-        console.log(idContribution);
     }
 
     removeMark(idContribution) {
@@ -148,7 +185,6 @@ class ConsultationPage extends Component {
                 canContribuateMark = true;
             } else {
                 for (var i = 0; i < userMarkContribution.length; i++) {
-                    console.log(userMarkContribution[i]);
                     if(userMarkContribution[i] == annotation.id) {
                         canContribuateMark = false;
                     }
@@ -232,6 +268,18 @@ class ConsultationPage extends Component {
                                 }
                             } else {
                                 for (var i = 0; i < responseData.data.length; i++) {
+                                    for(var j = 0; j < this.state.jsonDataUserWantedList.length; j++) {
+                                        if(this.state.jsonDataUserWantedList[j].name === responseData.data[i].name) {
+                                        	console.log("found");
+                                            //pokemonName = this.state.jsonDataUserWantedList[j].name;
+                                            //founderName = responseData.data[i].username;
+                                            PushNotification.localNotification({
+                                                title:  "One of your wanted pokemon was found !!",
+                                                autoCancel: true,
+                                                subtitle: "Pokealert",
+                                            });
+                                        }
+                                    }
                                     this.setState({
                                         annotations: [...this.state.annotations, {
                                             coordinates: [parseFloat(responseData.data[i].latitude), parseFloat(responseData.data[i].longitude)],
