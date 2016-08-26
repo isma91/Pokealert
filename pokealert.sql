@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Client :  localhost
--- Généré le :  Jeu 25 Août 2016 à 16:19
+-- Généré le :  Ven 26 Août 2016 à 09:27
 -- Version du serveur :  5.7.13-0ubuntu0.16.04.2
 -- Version de PHP :  7.0.8-0ubuntu0.16.04.2
 
@@ -37,9 +37,6 @@ CREATE TABLE `contribution` (
   `pokemonId` int(11) NOT NULL,
   `score` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
 --
 -- Structure de la table `pokemon`
 --
@@ -194,8 +191,10 @@ CREATE TABLE `user` (
   `password` text NOT NULL,
   `token` text,
   `contributionId` text,
-  `markContribution` text
+  `markContribution` text,
+  `wantedPokemon` text
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 --
 -- Index pour les tables exportées
 --
@@ -226,7 +225,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT pour la table `contribution`
 --
 ALTER TABLE `contribution`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 --
 -- AUTO_INCREMENT pour la table `pokemon`
 --
