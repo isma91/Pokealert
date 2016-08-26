@@ -168,8 +168,8 @@ class UsersController extends User
     public function getUserProfile ($id)
     {
         $bdd = new Bdd();
-        $user = array("profile" => [], "contribution" => [], "mark" => []);
-        $field = array("lastname", "firstname", "login", "contributionId", "markContribution");
+        $user = array("profile" => [], "contribution" => [], "mark" => [], "wanted" => []);
+        $field = array("lastname", "firstname", "login", "contributionId", "markContribution", "wantedPokemon");
         $where = "user.id = $id";
         $user["profile"] = $bdd->select("user", $field, $where)[0];
         if($user["profile"]["contributionId"] !== null) {
@@ -179,6 +179,10 @@ class UsersController extends User
         if($user["profile"]["markContribution"] !== null) {
             $userMarkContribution = explode(";", $user["profile"]["markContribution"]);
             $user["mark"] = $this->getUserMarkContribution($userMarkContribution);
+        }
+        if($user["profile"]["wantedPokemon"] !== null) {
+            $userWantedList = explode(";", $user["profile"]["wantedPokemon"]);
+            $user["wanted"] = $this->getUserPokemonWantedList($userWantedList);
         }
         if (!is_array($user["profile"])) {
             self::sendJson("Error while trying to get your profile !!", null);
@@ -217,6 +221,19 @@ class UsersController extends User
             $userMarkContribution[] = $bdd->select('contribution', $field, $where, $innerJoin);
         }
         return $userMarkContribution;
+    }
+
+    public function getUserPokemonWantedList(array $arrayPokemonId)
+    {
+        $bdd = new Bdd();
+        array_pop($arrayPokemonId);
+        $userWantedList = array();
+        $field = array("id", "name");
+        foreach ($arrayPokemonId as $pokemonId) {
+            $where = "id = $pokemonId";
+            $userWantedList[] = $bdd->select('pokemon', $field, $where);
+        }
+        return $userWantedList;
     }
 
     public function findAllLoginByName($login)
