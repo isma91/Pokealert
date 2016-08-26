@@ -46,6 +46,23 @@ Class PokemonsController extends Pokemon
         }
     }
 
+    public function addPokemonToWantedList($pokemonId, $user)
+    {
+        $bdd = new Bdd();
+        $fieldUser = array("wantedPokemon");
+        $whereUser = "login = '" . $user . "'";
+        $wantedUser = $bdd->select('user', $fieldUser, $whereUser)[0];
+        $wantedUser = $wantedUser["wantedPokemon"];
+        $fieldWantedUser = array("wantedPokemon" => $wantedUser . $pokemonId . ";");
+        $whereWantedUser = "login = '" . $user . "'";
+        $sqlWantedUser = $bdd->update('user', $fieldWantedUser, $whereWantedUser);
+        if ($sqlWantedUser === true) {
+            self::sendJson(null, null);
+        } else {
+            self::sendJson("Error wile adding the pokemon in your wanted list !!", null);
+        }
+    }
+
     public function findAllPokemonByName($pokemon)
     {
         $bdd = new Bdd();
