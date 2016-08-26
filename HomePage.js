@@ -71,6 +71,12 @@ class HomePage extends Component {
                         style={styles.button}>
                         Search Profile
                     </Button>
+                    <Button
+                        onPress={this.navigate.bind(this, "WantedPokemonPage")}
+                        containerStyle={styles.buttonContainer}
+                        style={styles.button}>
+                        Wanted Pokemon List
+                    </Button>
                 </View>
             );
         }
