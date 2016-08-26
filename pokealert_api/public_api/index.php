@@ -55,6 +55,9 @@ if (empty($json)) {
         case 'findAllLoginByName':
             $user->findAllLoginByName($json["login"]);
             break;
+        case 'addPokemonToWantedList':
+            $pokemon->addPokemonToWantedList($json["idPokemon"], $json["user"]);
+            break;
         case '':
             echo json_encode(array('error' => "Not a valid action !!", "data" => null));
             break;
