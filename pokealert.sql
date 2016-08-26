@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Client :  localhost
--- Généré le :  Ven 26 Août 2016 à 09:27
+-- Généré le :  Ven 26 Août 2016 à 11:54
 -- Version du serveur :  5.7.13-0ubuntu0.16.04.2
 -- Version de PHP :  7.0.8-0ubuntu0.16.04.2
 
@@ -37,6 +37,7 @@ CREATE TABLE `contribution` (
   `pokemonId` int(11) NOT NULL,
   `score` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 --
 -- Structure de la table `pokemon`
 --
@@ -194,7 +195,6 @@ CREATE TABLE `user` (
   `markContribution` text,
   `wantedPokemon` text
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
 --
 -- Index pour les tables exportées
 --
@@ -225,7 +225,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT pour la table `contribution`
 --
 ALTER TABLE `contribution`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 --
 -- AUTO_INCREMENT pour la table `pokemon`
 --
@@ -235,7 +235,7 @@ ALTER TABLE `pokemon`
 -- AUTO_INCREMENT pour la table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
